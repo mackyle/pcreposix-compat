@@ -279,6 +279,12 @@ static const pcre_uchar sub_end_of_word[] = {
   CHAR_RIGHT_PARENTHESIS, '\0' };
 
 
+/* Substitute for implicit newline. */
+
+static const pcre_uchar sub_implicit_newline[] = {
+  CHAR_BACKSLASH, CHAR_n, '\0' };
+
+
 /* Tables of names of POSIX character classes and their lengths. The names are
 now all in a single string, to reduce the number of relocations when a shared
 library is dynamically loaded. The list of lengths is terminated by a zero
@@ -4954,6 +4960,16 @@ for (;; ptr++)
     map. */
 
     memset(classbits, 0, 32 * sizeof(pcre_uint8));
+
+    /* If the PCRE_NOT_EXCLUDES_NL option is set AND the class started with '^',
+    stuff an ESC_n into the character class then resume. */
+
+    if (negate_class && (options & PCRE_NOT_EXCLUDES_NL) != 0)
+      {
+      nestptr = ptr - 1;
+      ptr = sub_implicit_newline;
+      c = *ptr;
+      }
 
     /* Process characters until ] is reached. By writing this as a "do" it
     means that an initial ] is taken as a data character. At the start of the

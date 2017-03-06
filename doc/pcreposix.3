@@ -88,9 +88,11 @@ compilation to the native function.
 .sp
   REG_NEWLINE
 .sp
-The PCRE_MULTILINE option is set when the regular expression is passed for
-compilation to the native function. Note that this does \fInot\fP mimic the
-defined POSIX behaviour for REG_NEWLINE (see the following section).
+When this option is \fInot\fP set both PCRE_DOTALL and PCRE_DOLLAR_ENDONLY
+are always passed to the native function.  When this option \fIis\fP set
+PCRE_MULTILINE and PCRE_NOT_EXCLUDES_NL are always passed to the native
+function. Note that this \fIdoes\fP mimic the defined POSIX behaviour for
+REG_NEWLINE (see the following section).
 .sp
   REG_NOSUB
 .sp
@@ -119,14 +121,23 @@ The PCRE_UTF8 option is set when the regular expression is passed for
 compilation to the native function. This causes the pattern itself and all data
 strings used for matching it to be treated as UTF-8 strings. Note that REG_UTF8
 is not part of the POSIX standard.
+.sp
+  REG_MULTILINE
+.sp
+The PCRE_MULTILINE option is set when the regular expression is passed for
+compilation to the native function. Note that this does \fInot\fP mimic the
+defined POSIX behaviour for REG_NEWLINE (see the following section).
 .P
-In the absence of these flags, no options are passed to the native function.
-This means the the regex is compiled with PCRE default semantics. In
-particular, the way it handles newline characters in the subject string is the
-Perl way, not the POSIX way. Note that setting PCRE_MULTILINE has only
-\fIsome\fP of the effects specified for REG_NEWLINE. It does not affect the way
-newlines are matched by . (they are not) or by a negative class such as [^a]
-(they are).
+In the absence of these flags, PCRE_DOTALL and PCRE_DOLLAR_ENDONLY are passed
+to the native function. This means the regex is compiled with POSIX default
+semantics. In particular, the way it handles newline characters in the subject
+string is the POSIX way, not the Perl way. Note that setting REG_MULTILINE has
+only \fIsome\fP of the effects specified for REG_NEWLINE. It does not affect
+the way newlines are matched by . (they are not) or by a negative class such as
+[^a] (they are).  However, setting REG_NEWLINE suppresses automatically passing
+PCRE_DOTALL (but REG_DOTALL can be used to set it) and PCRE_DOLLAR_ENDONLY and
+instead causes PCRE_MULTILINE (same as REG_MULTILINE) and PCRE_NOT_EXCLUDES_NL
+to be passed to the native function which mimics POSIX REG_NEWLINE behaviour.
 .P
 The yield of \fBregcomp()\fP is zero on success, and non-zero otherwise. The
 \fIpreg\fP structure is filled in on success, and one member of the structure
@@ -142,15 +153,15 @@ use the contents of the \fIpreg\fP structure. If, for example, you pass it to
 .rs
 .sp
 This area is not simple, because POSIX and Perl take different views of things.
-It is not possible to get PCRE to obey POSIX semantics, but then PCRE was never
-intended to be a POSIX engine. The following table lists the different
+It is possible to get PCRE to mostly obey POSIX semantics and that is what
+pcreposix attempts to do. The following table lists the different
 possibilities for matching newline characters in PCRE:
 .sp
                           Default   Change with
 .sp
   . matches newline          no     PCRE_DOTALL
-  newline matches [^a]       yes    not changeable
-  $ matches \en at end        yes    PCRE_DOLLARENDONLY
+  newline matches [^a]       yes    PCRE_NOT_EXCLUDES_NL
+  $ matches \en at end        yes    PCRE_DOLLAR_ENDONLY
   $ matches \en in middle     no     PCRE_MULTILINE
   ^ matches \en in middle     no     PCRE_MULTILINE
 .sp
@@ -165,12 +176,13 @@ This is the equivalent table for POSIX:
   ^ matches \en in middle     no     REG_NEWLINE
 .sp
 PCRE's behaviour is the same as Perl's, except that there is no equivalent for
-PCRE_DOLLAR_ENDONLY in Perl. In both PCRE and Perl, there is no way to stop
-newline from matching [^a].
+PCRE_DOLLAR_ENDONLY in Perl. In Perl there is no way to stop newline from
+matching [^a] like PCRE's PCRE_NOT_EXCLUDES_NL option does.
 .P
 The default POSIX newline handling can be obtained by setting PCRE_DOTALL and
-PCRE_DOLLAR_ENDONLY, but there is no way to make PCRE behave exactly as for the
-REG_NEWLINE action.
+PCRE_DOLLAR_ENDONLY which is what happens when REG_NEWLINE is NOT set. When
+REG_NEWLINE IS set PCRE_NOT_EXCLUDES_NL and PCRE_MULTILINE are set instead to
+mimic the POSIX behavior exactly in that case.
 .
 .
 .SH "MATCHING A PATTERN"
