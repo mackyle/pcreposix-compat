@@ -139,6 +139,44 @@ No match: POSIX code 17: match failed
 /abc/\P
 Failed: POSIX code 9: bad escape sequence at offset 4     
 
+/x[^a]y.z$/P
+    x\ny\nz
+ 0: x\x0ay\x0az
+    x_y_z
+ 0: x_y_z
+    ** Failers
+No match: POSIX code 17: match failed
+    x_y_z\n
+No match: POSIX code 17: match failed
+
+/x[^a]y/Pm
+    ** Failers
+No match: POSIX code 17: match failed
+    x\ny
+No match: POSIX code 17: match failed
+
+/x.y$/Pm
+    x_y\n
+ 0: x_y
+    ** Failers
+No match: POSIX code 17: match failed
+    x\ny
+No match: POSIX code 17: match failed
+
+/x[^a]y.z$/Pm
+    x_y_z
+ 0: x_y_z
+    x_y_z\n
+ 0: x_y_z
+    ** Failers
+No match: POSIX code 17: match failed
+    x\ny_z
+No match: POSIX code 17: match failed
+    x_y\nz
+No match: POSIX code 17: match failed
+    x\ny\nz
+No match: POSIX code 17: match failed
+
 /-- End of POSIX tests --/ 
 
 /a\Cb/
