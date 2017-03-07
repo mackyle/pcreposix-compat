@@ -27,11 +27,12 @@
     The Quick Brown Fox
 
 /abc.def/P
-    *** Failers
     abc\ndef
+    *** Failers
 
 /abc$/P
     abc
+    *** Failers
     abc\n
 
 /(abc)\2/P
@@ -51,8 +52,8 @@
 /ab.cd/P
     ab-cd
     ab=cd
-    ** Failers
     ab\ncd
+    ** Failers
 
 /ab.cd/Ps
     ab-cd
