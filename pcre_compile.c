@@ -9365,6 +9365,7 @@ cd->parens_depth = 0;
 cd->assert_depth = 0;
 cd->max_lookbehind = 0;
 cd->external_options = options;
+cd->extended_options = options2;
 cd->open_caps = NULL;
 
 /* Now do the pre-compile. On error, errorcode will be set non-zero, so we

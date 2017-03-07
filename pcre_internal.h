@@ -2460,6 +2460,7 @@ typedef struct compile_data {
   int  parens_depth;                /* Depth of nested parentheses */
   int  assert_depth;                /* Depth of nested assertions */
   pcre_uint32 external_options;     /* External (initial) options */
+  pcre_uint32 extended_options;     /* External extended (initial) options */
   pcre_uint32 external_flags;       /* External flag bits to be set */
   int  req_varyopt;                 /* "After variable item" flag for reqbyte */
   BOOL had_accept;                  /* (*ACCEPT) encountered */
