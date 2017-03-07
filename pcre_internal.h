@@ -1119,6 +1119,18 @@ time, run time, or study time, respectively. */
    PCRE_DUPNAMES|PCRE_NEWLINE_BITS|PCRE_BSR_ANYCRLF|PCRE_BSR_UNICODE| \
    PCRE_JAVASCRIPT_COMPAT|PCRE_UCP|PCRE_NO_START_OPTIMIZE|PCRE_NEVER_UTF)
 
+/* If this bit is set then "extended public 'C1  Affects compile only'" option
+bits are present -- at least one reused non-public API bit must also be set. */
+
+#define PCRE_XC1OPTIONS    0x40000000  /* extended compile-only public api */
+
+#define PUBLIC_EXTENDED_COMPILE_OPTIONS \
+   (0)
+
+#if (PUBLIC_COMPILE_OPTIONS & PUBLIC_EXTENDED_COMPILE_OPTIONS) != 0
+#error PUBLIC_EXTENDED_COMPILE_OPTIONS conflicts with PUBLIC_COMPILE_OPTIONS
+#endif
+
 #define PUBLIC_EXEC_OPTIONS \
   (PCRE_ANCHORED|PCRE_NOTBOL|PCRE_NOTEOL|PCRE_NOTEMPTY|PCRE_NOTEMPTY_ATSTART| \
    PCRE_NO_UTF8_CHECK|PCRE_PARTIAL_HARD|PCRE_PARTIAL_SOFT|PCRE_NEWLINE_BITS| \

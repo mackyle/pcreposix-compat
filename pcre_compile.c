@@ -9049,6 +9049,7 @@ pcre_uint32 firstchar, reqchar;
 pcre_uint32 limit_match = PCRE_UINT32_MAX;
 pcre_uint32 limit_recursion = PCRE_UINT32_MAX;
 int newline;
+int options2;
 int errorcode = 0;
 int skipatstart = 0;
 BOOL utf;
@@ -9111,11 +9112,20 @@ cd->ctypes = tables + ctypes_offset;
 
 /* Check that all undefined public option bits are zero */
 
-if ((options & ~PUBLIC_COMPILE_OPTIONS) != 0)
+if ((options & ~(PUBLIC_COMPILE_OPTIONS | PUBLIC_EXTENDED_COMPILE_OPTIONS)) != 0 ||
+    (((options & PCRE_XC1OPTIONS) != 0) &&
+     (options & (PUBLIC_EXTENDED_COMPILE_OPTIONS & ~PCRE_XC1OPTIONS)) == 0) ||
+    (((options & PCRE_XC1OPTIONS) == 0) &&
+     (options & (PUBLIC_EXTENDED_COMPILE_OPTIONS & ~PCRE_XC1OPTIONS)) != 0))
   {
   errorcode = ERR17;
   goto PCRE_EARLY_ERROR_RETURN;
   }
+
+/* Extract the extended public options (stripping the PCRE_XC1OPTIONS bit) */
+
+options2 = options & (PUBLIC_EXTENDED_COMPILE_OPTIONS & ~PCRE_XC1OPTIONS);
+options &= ~PUBLIC_EXTENDED_COMPILE_OPTIONS;
 
 /* If PCRE_NEVER_UTF is set, remember it. */
 
