@@ -4964,7 +4964,7 @@ for (;; ptr++)
     /* If the PCRE_NOT_EXCLUDES_NL option is set AND the class started with '^',
     stuff an ESC_n into the character class then resume. */
 
-    if (negate_class && (options & PCRE_NOT_EXCLUDES_NL) != 0)
+    if (negate_class && nestptr == NULL && (cd->extended_options & PCRE_NOT_EXCLUDES_NL_BIT) != 0)
       {
       nestptr = ptr - 1;
       ptr = sub_implicit_newline;
