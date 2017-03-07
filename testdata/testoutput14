@@ -42,16 +42,18 @@ No match: POSIX code 17: match failed
  0: The Quick Brown Fox
 
 /abc.def/P
-    *** Failers
-No match: POSIX code 17: match failed
     abc\ndef
+ 0: abc\x0adef
+    *** Failers
 No match: POSIX code 17: match failed
 
 /abc$/P
     abc
  0: abc
+    *** Failers
+No match: POSIX code 17: match failed
     abc\n
- 0: abc
+No match: POSIX code 17: match failed
 
 /(abc)\2/P
 Failed: POSIX code 15: bad back reference at offset 7     
@@ -92,9 +94,9 @@ No match: POSIX code 17: match failed
  0: ab-cd
     ab=cd
  0: ab=cd
-    ** Failers
-No match: POSIX code 17: match failed
     ab\ncd
+ 0: ab\x0acd
+    ** Failers
 No match: POSIX code 17: match failed
 
 /ab.cd/Ps
