@@ -82,6 +82,29 @@
 
 /abc/\P
 
+/x[^a]y.z$/P
+    x\ny\nz
+    x_y_z
+    ** Failers
+    x_y_z\n
+
+/x[^a]y/Pm
+    ** Failers
+    x\ny
+
+/x.y$/Pm
+    x_y\n
+    ** Failers
+    x\ny
+
+/x[^a]y.z$/Pm
+    x_y_z
+    x_y_z\n
+    ** Failers
+    x\ny_z
+    x_y\nz
+    x\ny\nz
+
 /-- End of POSIX tests --/ 
 
 /a\Cb/
