@@ -37,7 +37,7 @@ the following changes are effected:
    REG_EXTENDED unset:
      PCRE_POSIX_BASIC_ESC is set
 
-   This obviously neccessitates changing the definition of
+   This obviously necessitates changing the definition of
    REG_EXTENDED to a value other than 0.
 
 3. A new REG_BASIC define is added with the value 0.
