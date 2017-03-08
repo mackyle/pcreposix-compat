@@ -964,21 +964,26 @@ Returns:    TRUE or FALSE
 */
 
 static BOOL
-is_counted_repeat(const pcre_uchar *p)
+is_counted_repeat(const pcre_uchar *p, BOOL basicre)
 {
 if (!IS_DIGIT(*p)) return FALSE;
 p++;
 while (IS_DIGIT(*p)) p++;
-if (*p == CHAR_RIGHT_CURLY_BRACKET) return TRUE;
+if ((*p == CHAR_RIGHT_CURLY_BRACKET && !basicre) ||
+    (basicre && *p == CHAR_BACKSLASH && p[1] == CHAR_RIGHT_CURLY_BRACKET))
+  return TRUE;
 
 if (*p++ != CHAR_COMMA) return FALSE;
-if (*p == CHAR_RIGHT_CURLY_BRACKET) return TRUE;
+if ((*p == CHAR_RIGHT_CURLY_BRACKET && !basicre) ||
+    (basicre && *p == CHAR_BACKSLASH && p[1] == CHAR_RIGHT_CURLY_BRACKET))
+  return TRUE;
 
 if (!IS_DIGIT(*p)) return FALSE;
 p++;
 while (IS_DIGIT(*p)) p++;
 
-return (*p == CHAR_RIGHT_CURLY_BRACKET);
+return ((*p == CHAR_RIGHT_CURLY_BRACKET && !basicre) ||
+        (basicre && *p == CHAR_BACKSLASH && p[1] == CHAR_RIGHT_CURLY_BRACKET));
 }
 
 
@@ -1477,7 +1482,7 @@ newline". PCRE does not support \N{name}. However, it does support
 quantification such as \N{2,3}. */
 
 if (escape == ESC_N && ptr[1] == CHAR_LEFT_CURLY_BRACKET &&
-     !is_counted_repeat(ptr+2))
+     !is_counted_repeat(ptr+2, FALSE))
   *errorcodeptr = ERR37;
 
 /* If PCRE_UCP is set, we change the values for \d etc. */
@@ -1626,9 +1631,10 @@ while (IS_DIGIT(*p))
     }
   }
 
+if (*p == CHAR_BACKSLASH) ++p;
 if (*p == CHAR_RIGHT_CURLY_BRACKET) max = min; else
   {
-  if (*(++p) != CHAR_RIGHT_CURLY_BRACKET)
+  if (*(++p) != CHAR_RIGHT_CURLY_BRACKET && *p != CHAR_BACKSLASH)
     {
     max = 0;
     while(IS_DIGIT(*p))
@@ -1646,6 +1652,7 @@ if (*p == CHAR_RIGHT_CURLY_BRACKET) max = min; else
       return p;
       }
     }
+  if (*p == CHAR_BACKSLASH) ++p;
   }
 
 *minp = min;
@@ -4482,6 +4489,7 @@ pcre_uchar *last_code = code;
 pcre_uchar *orig_code = code;
 pcre_uchar *tempcode;
 BOOL inescq = FALSE;
+BOOL basicre = (cd->extended_options & PCRE_POSIX_BASIC_ESC_BIT) != 0;
 BOOL groupsetfirstchar = FALSE;
 const pcre_uchar *ptr = *ptrptr;
 const pcre_uchar *tempptr;
@@ -4490,6 +4498,7 @@ pcre_uchar *previous = NULL;
 pcre_uchar *previous_callout = NULL;
 size_t item_hwm_offset = 0;
 pcre_uint8 classbits[32];
+pcre_uchar sub_basic_esc[3];
 
 /* We can fish out the UTF-8 setting once and for all into a BOOL, but we
 must not do this for other options (e.g. PCRE_EXTENDED) because they may change
@@ -4589,6 +4598,32 @@ for (;; ptr++)
     ptr = nestptr;
     nestptr = NULL;
     c = *ptr;
+    }
+
+  if (nestptr == NULL && !inescq && basicre)
+    {
+    if (c == CHAR_LEFT_PARENTHESIS || c == CHAR_RIGHT_PARENTHESIS ||
+       c == CHAR_LEFT_CURLY_BRACKET || c == CHAR_RIGHT_CURLY_BRACKET ||
+       c == CHAR_QUESTION_MARK || c == CHAR_PLUS || c == CHAR_VERTICAL_LINE ||
+       (c == CHAR_BACKSLASH && !(ptr[1] == CHAR_LEFT_PARENTHESIS ||
+                                 ptr[1] == CHAR_RIGHT_PARENTHESIS ||
+                                 ptr[1] == CHAR_LEFT_CURLY_BRACKET ||
+                                 ptr[1] == CHAR_RIGHT_CURLY_BRACKET)))
+      {
+      sub_basic_esc[2] = CHAR_NULL;
+      sub_basic_esc[1] = c;
+      sub_basic_esc[0] = c = CHAR_BACKSLASH;
+      nestptr = ptr + 1;
+      ptr = sub_basic_esc;
+      }
+    else if (c == CHAR_BACKSLASH &&
+             (ptr[1] == CHAR_LEFT_PARENTHESIS ||
+              ptr[1] == CHAR_RIGHT_PARENTHESIS ||
+              ptr[1] == CHAR_LEFT_CURLY_BRACKET ||
+              ptr[1] == CHAR_RIGHT_CURLY_BRACKET))
+      {
+      c = *(++ptr);
+      }
     }
 
   /* If we are in the pre-compile phase, accumulate the length used for the
@@ -4730,7 +4765,7 @@ for (;; ptr++)
   and its quantifier. */
 
   if (c == CHAR_LEFT_PARENTHESIS && ptr[1] == CHAR_QUESTION_MARK &&
-      ptr[2] == CHAR_NUMBER_SIGN)
+      ptr[2] == CHAR_NUMBER_SIGN && (!basicre || nestptr))
     {
     ptr += 3;
     while (*ptr != CHAR_NULL && *ptr != CHAR_RIGHT_PARENTHESIS) ptr++;
@@ -4746,7 +4781,7 @@ for (;; ptr++)
 
   is_quantifier =
     c == CHAR_ASTERISK || c == CHAR_PLUS || c == CHAR_QUESTION_MARK ||
-    (c == CHAR_LEFT_CURLY_BRACKET && is_counted_repeat(ptr+1));
+    (c == CHAR_LEFT_CURLY_BRACKET && is_counted_repeat(ptr+1, basicre && !nestptr));
 
   /* Fill in length of a previous callout, except when the next thing is a
   quantifier or when processing a property substitution string in UCP mode. */
@@ -4898,7 +4933,7 @@ for (;; ptr++)
     for (;;)
       {
       c = *(++ptr);
-      if (c == CHAR_BACKSLASH)
+      if (c == CHAR_BACKSLASH && (!basicre || nestptr))
         {
         if (ptr[1] == CHAR_E)
           ptr++;
@@ -5183,7 +5218,7 @@ for (;; ptr++)
       as literal characters (by default), or are faulted if
       PCRE_EXTRA is set. */
 
-      if (c == CHAR_BACKSLASH)
+      if (c == CHAR_BACKSLASH && (!basicre || nestptr))
         {
         escape = check_escape(&ptr, &ec, errorcodeptr, cd->bracount, options,
           TRUE);
@@ -5334,7 +5369,7 @@ for (;; ptr++)
       code for handling \Q and \E is messy. */
 
       CHECK_RANGE:
-      while (ptr[1] == CHAR_BACKSLASH && ptr[2] == CHAR_E)
+      while (ptr[1] == CHAR_BACKSLASH && ptr[2] == CHAR_E && (!basicre || nestptr))
         {
         inescq = FALSE;
         ptr += 2;
@@ -5351,12 +5386,12 @@ for (;; ptr++)
         {
         pcre_uint32 d;
         ptr += 2;
-        while (*ptr == CHAR_BACKSLASH && ptr[1] == CHAR_E) ptr += 2;
+        while (*ptr == CHAR_BACKSLASH && ptr[1] == CHAR_E && (!basicre || nestptr)) ptr += 2;
 
         /* If we hit \Q (not followed by \E) at this point, go into escaped
         mode. */
 
-        while (*ptr == CHAR_BACKSLASH && ptr[1] == CHAR_Q)
+        while (*ptr == CHAR_BACKSLASH && ptr[1] == CHAR_Q && (!basicre || nestptr))
           {
           ptr += 2;
           if (*ptr == CHAR_BACKSLASH && ptr[1] == CHAR_E)
@@ -5393,7 +5428,7 @@ for (;; ptr++)
 
         if (!inescq)
           {
-          if (d == CHAR_BACKSLASH)
+          if (d == CHAR_BACKSLASH && (!basicre || nestptr))
             {
             int descape;
             descape = check_escape(&ptr, &d, errorcodeptr, cd->bracount, options, TRUE);
@@ -5761,13 +5796,13 @@ for (;; ptr++)
     but if PCRE_UNGREEDY is set, it works the other way round. We change the
     repeat type to the non-default. */
 
-    if (ptr[1] == CHAR_PLUS)
+    if (ptr[1] == CHAR_PLUS && (!basicre || nestptr))
       {
       repeat_type = 0;                  /* Force greedy */
       possessive_quantifier = TRUE;
       ptr++;
       }
-    else if (ptr[1] == CHAR_QUESTION_MARK)
+    else if (ptr[1] == CHAR_QUESTION_MARK && (!basicre || nestptr))
       {
       repeat_type = greedy_non_default;
       ptr++;
@@ -6614,7 +6649,7 @@ for (;; ptr++)
 
     /* Now deal with various "verbs" that can be introduced by '*'. */
 
-    if (ptr[0] == CHAR_ASTERISK && (ptr[1] == ':'
+    if (ptr[0] == CHAR_ASTERISK && (!basicre || nestptr) && (ptr[1] == ':'
          || (MAX_255(ptr[1]) && ((cd->ctypes[ptr[1]] & ctype_letter) != 0))))
       {
       int i, namelen;
@@ -6766,7 +6801,7 @@ for (;; ptr++)
     /* Deal with the extended parentheses; all are introduced by '?', and the
     appearance of any of them means that this is not a capturing group. */
 
-    if (*ptr == CHAR_QUESTION_MARK)
+    if (*ptr == CHAR_QUESTION_MARK && (!basicre || nestptr))
       {
       int i, set, unset, namelen;
       int *optset;
@@ -7078,7 +7113,7 @@ for (;; ptr++)
         ptr++;
         if (*ptr == CHAR_RIGHT_PARENTHESIS && ptr[1] != CHAR_ASTERISK &&
              ptr[1] != CHAR_PLUS && ptr[1] != CHAR_QUESTION_MARK &&
-            (ptr[1] != CHAR_LEFT_CURLY_BRACKET || !is_counted_repeat(ptr+2)))
+            (ptr[1] != CHAR_LEFT_CURLY_BRACKET || !is_counted_repeat(ptr+2, FALSE)))
           {
           *code++ = OP_FAIL;
           previous = NULL;
@@ -9153,7 +9188,8 @@ the offset for later. */
 cd->external_flags = 0;   /* Initialize here for LIMIT_MATCH/RECURSION */
 
 while (ptr[skipatstart] == CHAR_LEFT_PARENTHESIS &&
-       ptr[skipatstart+1] == CHAR_ASTERISK)
+       ptr[skipatstart+1] == CHAR_ASTERISK &&
+       !(options2 & PCRE_POSIX_BASIC_ESC_BIT))
   {
   int newnl = 0;
   int newbsr = 0;

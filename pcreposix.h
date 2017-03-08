@@ -65,10 +65,8 @@ extern "C" {
 #define REG_UCP       0x0400   /* NOT defined by POSIX; maps to PCRE_UCP */
 #define REG_MULTILINE 0x0800   /* NOT defined by POSIX; maps to PCRE_MULTILINE */
 
-/* This is not used by PCRE, but by defining it we make it easier
-to slot PCRE into existing programs that make POSIX calls. */
-
-#define REG_EXTENDED  0
+#define REG_BASIC     0        /* BSD define */
+#define REG_EXTENDED  0x1000   /* Maps to !PCRE_POSIX_BASIC_ESC */
 
 /* Error values. Not all these are relevant or used by the wrapper. */
 

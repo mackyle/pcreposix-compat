@@ -274,6 +274,8 @@ int errorcode;
 int options = 0;
 int re_nsub = 0;
 
+if ((cflags & REG_EXTENDED) == 0)  options |= PCRE_POSIX_BASIC_ESC;
+
 if ((cflags & REG_ICASE) != 0)     options |= PCRE_CASELESS;
 if ((cflags & REG_MULTILINE) != 0) options |= PCRE_MULTILINE;
 if ((cflags & REG_DOTALL) != 0)    options |= PCRE_DOTALL;

@@ -3793,7 +3793,7 @@ while (!done)
       case 'O': options |= PCRE_NO_AUTO_POSSESS; break;
 
 #if !defined NOPOSIX
-      case 'P': do_posix = 1; break;
+      case 'P': do_posix += 1; break;
 #endif
 
       case 'Q':
@@ -3929,7 +3929,7 @@ while (!done)
   if (posix || do_posix)
     {
     int rc;
-    int cflags = 0;
+    int cflags = do_posix < 2 ? REG_EXTENDED : REG_BASIC;
 
     if ((options & PCRE_CASELESS) != 0) cflags |= REG_ICASE;
     if ((options & PCRE_MULTILINE) != 0) cflags |= REG_NEWLINE;
