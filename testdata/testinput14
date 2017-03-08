@@ -111,8 +111,11 @@
     ababbabb\n
     ababbab
 
-/(*UTF)\(?:\)\Q[X]\E[\Q]\{2,2\}|\E+./PP
-    (UTF)?:\\QX\\EQ\\|\\E+\n
+/(*UTF)\(?:\)\\Q[X]\\E[\Q\E]\{3,3\}|\\E+./PP
+    (UTF)?:\\QX\\EEQ\\|\\E+\n
+
+/^\(\^\)\{1,1\}\1\\\.\*\[\]\]\$$/PP
+    ^^\\.*[]]$
 
 /-- End of POSIX tests --/ 
 

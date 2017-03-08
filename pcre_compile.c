@@ -4604,12 +4604,7 @@ for (;; ptr++)
     {
     if (c == CHAR_LEFT_PARENTHESIS || c == CHAR_RIGHT_PARENTHESIS ||
        c == CHAR_LEFT_CURLY_BRACKET || c == CHAR_RIGHT_CURLY_BRACKET ||
-       c == CHAR_QUESTION_MARK || c == CHAR_PLUS || c == CHAR_VERTICAL_LINE ||
-       (c == CHAR_BACKSLASH && !((CHAR_1 <= ptr[1] && ptr[1] <= CHAR_9) ||
-                                 ptr[1] == CHAR_LEFT_PARENTHESIS ||
-                                 ptr[1] == CHAR_RIGHT_PARENTHESIS ||
-                                 ptr[1] == CHAR_LEFT_CURLY_BRACKET ||
-                                 ptr[1] == CHAR_RIGHT_CURLY_BRACKET)))
+       c == CHAR_QUESTION_MARK || c == CHAR_PLUS || c == CHAR_VERTICAL_LINE)
       {
       sub_basic_esc[2] = CHAR_NULL;
       sub_basic_esc[1] = c;
@@ -4618,10 +4613,10 @@ for (;; ptr++)
       ptr = sub_basic_esc;
       }
     else if (c == CHAR_BACKSLASH &&
-             (ptr[1] == CHAR_LEFT_PARENTHESIS ||
-              ptr[1] == CHAR_RIGHT_PARENTHESIS ||
-              ptr[1] == CHAR_LEFT_CURLY_BRACKET ||
-              ptr[1] == CHAR_RIGHT_CURLY_BRACKET))
+             !((CHAR_1 <= ptr[1] && ptr[1] <= CHAR_9) ||
+               ptr[1] == CHAR_BACKSLASH || ptr[1] == CHAR_DOT ||
+               ptr[1] == CHAR_LEFT_SQUARE_BRACKET || ptr[1] == CHAR_ASTERISK ||
+               ptr[1] == CHAR_CIRCUMFLEX_ACCENT || ptr[1] == CHAR_DOLLAR_SIGN))
       {
       c = *(++ptr);
       }

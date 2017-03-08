@@ -188,10 +188,15 @@ No match: POSIX code 17: match failed
     ababbab
 No match: POSIX code 17: match failed
 
-/(*UTF)\(?:\)\Q[X]\E[\Q]\{2,2\}|\E+./PP
-    (UTF)?:\\QX\\EQ\\|\\E+\n
- 0: (UTF)?:\QX\EQ\|\E+\x0a
+/(*UTF)\(?:\)\\Q[X]\\E[\Q\E]\{3,3\}|\\E+./PP
+    (UTF)?:\\QX\\EEQ\\|\\E+\n
+ 0: (UTF)?:\QX\EEQ\|\E+\x0a
  1: ?:
+
+/^\(\^\)\{1,1\}\1\\\.\*\[\]\]\$$/PP
+    ^^\\.*[]]$
+ 0: ^^\.*[]]$
+ 1: ^
 
 /-- End of POSIX tests --/ 
 
