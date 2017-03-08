@@ -1,49 +1,24 @@
 From: Kyle J. McKay <mackyle@gmail.com>
-Subject: [PATCH] support pcreposix !REG_EXTENDED POSIX emulation
+Subject: [PATCH] pcreposix: add REG_NOSPEC support
 
-The pcreposix wrapper emulates the POSIX regex library fairly well
-for those aspects of the standard it supports.  However, support
-for !REG_EXTENDED (aka BREs "Basic Regular Expressions") is missing.
+The REG_NOSPEC regcomp() option causes the pattern string
+to be treated as a literal.
 
-Unfortunately, this greatly limits its ability to be used as a
-drop-in replacement.
+This is a BSDism, but since it's relatively easy to implement
+and it improves regex.h compatibility go ahead and add it.
 
-In order to add support for !REG_EXTENDED patterns (aka BREs),
-the following changes are effected:
+To implement this the following changes are effected:
 
-1. A new PCRE_POSIX_BASIC_ESC option is provided.
+1. A new PCRE_VERBATIM option is provided.
 
-   This is implemented in the standard PCRE library and is
-   available for any caller to use.  It causes all occurrences
-   of '+', '?' and '|' to always be automatically escaped meaning
-   they always match literally and it causes '(', ')', '{', and '}'
-   to become escaped (i.e. preceded by a backslash '\') if they
-   are not or to ignore a preceding backslash if they are.
-   (Obviously if they are inside a character class their behavior
-   remains unchanged even when using this option.)
+   This implicitly prefixes the pattern with \Q and then
+   disables recognition of \E thereby causing even \E to
+   be taken literally.
 
-   This has the effect of changing the grouping delimiters from
-   '(' and ')' to '\(' and '\)' and the quantifier delimiters
-   from '{' and '}' to '\{' and '\}' while making any bare
-   '(', ')', '{', or '}' characters match literally.
+2. A new REG_NOSPEC option is provided that maps to PCRE_VERBATIM.
 
-   This is how POSIX BREs are specified.  Note that because the
-   '+', '?' and '|' characters are always matched literally
-   with this option (whether preceded by a backslash or not),
-   alternation and minimal matching become inaccessible.
-
-2. The pcreposix wrapper adds the following behavior:
-
-   REG_EXTENDED unset:
-     PCRE_POSIX_BASIC_ESC is set
-
-   This obviously necessitates changing the definition of
-   REG_EXTENDED to a value other than 0.
-
-3. A new REG_BASIC define is added with the value 0.
-
-   The BSDish headers define this so it's nice to have
-   for compatibility.
+   Although it's "new" to pcreposix, it provides the same
+   behavior as the BSD REG_NOSPEC option.
 
 Note: This patch is licensed under the same terms as PCRE itself.
 
