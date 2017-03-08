@@ -283,6 +283,7 @@ if ((cflags & REG_NOSUB) != 0)     options |= PCRE_NO_AUTO_CAPTURE;
 if ((cflags & REG_UTF8) != 0)      options |= PCRE_UTF8;
 if ((cflags & REG_UCP) != 0)       options |= PCRE_UCP;
 if ((cflags & REG_UNGREEDY) != 0)  options |= PCRE_UNGREEDY;
+if ((cflags & REG_NOSPEC) != 0)    options |= PCRE_VERBATIM;
 
 if ((cflags & REG_NEWLINE) == 0)   options |= PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
 if ((cflags & REG_NEWLINE) != 0)   options |= PCRE_MULTILINE | PCRE_NOT_EXCLUDES_NL;

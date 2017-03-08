@@ -64,6 +64,7 @@ extern "C" {
 #define REG_UNGREEDY  0x0200   /* NOT defined by POSIX; maps to PCRE_UNGREEDY */
 #define REG_UCP       0x0400   /* NOT defined by POSIX; maps to PCRE_UCP */
 #define REG_MULTILINE 0x0800   /* NOT defined by POSIX; maps to PCRE_MULTILINE */
+#define REG_NOSPEC    0x2000   /* BSD feature: treat pattern as literal string */
 
 #define REG_BASIC     0        /* BSD define */
 #define REG_EXTENDED  0x1000   /* Maps to !PCRE_POSIX_BASIC_ESC */

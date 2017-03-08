@@ -171,6 +171,7 @@ with J. */
 #define PCRE_UCP                0x20000000  /* C3       */
 #define PCRE_NOT_EXCLUDES_NL    0x40000080  /* C1        ) Extended */
 #define PCRE_POSIX_BASIC_ESC    0x40000100  /* C1        ) Extended */
+#define PCRE_VERBATIM           0x40000400  /* C1        ) Extended */
 
 /* Exec-time and get/set-time error codes */
 

@@ -3788,6 +3788,7 @@ while (!done)
       case 'I': do_showinfo = 1; break;
       case 'J': options |= PCRE_DUPNAMES; break;
       case 'K': do_mark = 1; break;
+      case 'V': options |= PCRE_VERBATIM; break;
       case 'M': log_store = 1; break;
       case 'N': options |= PCRE_NO_AUTO_CAPTURE; break;
       case 'O': options |= PCRE_NO_AUTO_POSSESS; break;

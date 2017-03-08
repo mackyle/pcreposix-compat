@@ -4488,7 +4488,7 @@ register pcre_uchar *code = *codeptr;
 pcre_uchar *last_code = code;
 pcre_uchar *orig_code = code;
 pcre_uchar *tempcode;
-BOOL inescq = FALSE;
+BOOL inescq = (cd->extended_options & PCRE_VERBATIM_BIT) != 0;
 BOOL basicre = (cd->extended_options & PCRE_POSIX_BASIC_ESC_BIT) != 0;
 BOOL groupsetfirstchar = FALSE;
 const pcre_uchar *ptr = *ptrptr;
@@ -4694,7 +4694,8 @@ for (;; ptr++)
 
   if (c != CHAR_NULL)
     {
-    if (c == CHAR_BACKSLASH && ptr[1] == CHAR_E)
+    if (c == CHAR_BACKSLASH && ptr[1] == CHAR_E &&
+        (cd->extended_options & PCRE_VERBATIM_BIT) == 0)
       {
       inescq = FALSE;
       ptr++;
@@ -9186,7 +9187,7 @@ cd->external_flags = 0;   /* Initialize here for LIMIT_MATCH/RECURSION */
 
 while (ptr[skipatstart] == CHAR_LEFT_PARENTHESIS &&
        ptr[skipatstart+1] == CHAR_ASTERISK &&
-       !(options2 & PCRE_POSIX_BASIC_ESC_BIT))
+       !(options2 & (PCRE_POSIX_BASIC_ESC_BIT|PCRE_VERBATIM_BIT)))
   {
   int newnl = 0;
   int newbsr = 0;
