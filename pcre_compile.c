@@ -4605,7 +4605,8 @@ for (;; ptr++)
     if (c == CHAR_LEFT_PARENTHESIS || c == CHAR_RIGHT_PARENTHESIS ||
        c == CHAR_LEFT_CURLY_BRACKET || c == CHAR_RIGHT_CURLY_BRACKET ||
        c == CHAR_QUESTION_MARK || c == CHAR_PLUS || c == CHAR_VERTICAL_LINE ||
-       (c == CHAR_BACKSLASH && !(ptr[1] == CHAR_LEFT_PARENTHESIS ||
+       (c == CHAR_BACKSLASH && !((CHAR_1 <= ptr[1] && ptr[1] <= CHAR_9) ||
+                                 ptr[1] == CHAR_LEFT_PARENTHESIS ||
                                  ptr[1] == CHAR_RIGHT_PARENTHESIS ||
                                  ptr[1] == CHAR_LEFT_CURLY_BRACKET ||
                                  ptr[1] == CHAR_RIGHT_CURLY_BRACKET)))
