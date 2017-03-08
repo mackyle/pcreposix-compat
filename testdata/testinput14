@@ -105,6 +105,15 @@
     x_y\nz
     x\ny\nz
 
+/^\(ab*\)*\1$/PP
+    ababbabb
+    ** Failers
+    ababbabb\n
+    ababbab
+
+/(*UTF)\(?:\)\Q[X]\E[\Q]\{2,2\}|\E+./PP
+    (UTF)?:\\QX\\EQ\\|\\E+\n
+
 /-- End of POSIX tests --/ 
 
 /a\Cb/

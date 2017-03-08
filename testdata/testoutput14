@@ -177,6 +177,22 @@ No match: POSIX code 17: match failed
     x\ny\nz
 No match: POSIX code 17: match failed
 
+/^\(ab*\)*\1$/PP
+    ababbabb
+ 0: ababbabb
+ 1: abb
+    ** Failers
+No match: POSIX code 17: match failed
+    ababbabb\n
+No match: POSIX code 17: match failed
+    ababbab
+No match: POSIX code 17: match failed
+
+/(*UTF)\(?:\)\Q[X]\E[\Q]\{2,2\}|\E+./PP
+    (UTF)?:\\QX\\EQ\\|\\E+\n
+ 0: (UTF)?:\QX\EQ\|\E+\x0a
+ 1: ?:
+
 /-- End of POSIX tests --/ 
 
 /a\Cb/
