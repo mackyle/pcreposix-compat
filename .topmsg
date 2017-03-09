@@ -1,61 +1,117 @@
 From: Kyle J. McKay <mackyle@gmail.com>
-Subject: [PATCH] pcreposix: add REG_PEND support
+Subject: [PATCH] pcreposix: REG_PCRE and friends
 
-The REG_PEND regcomp() option allows the pattern string to
-consist of arbitrary bytes (i.e. not necessarily NUL terminated
-and possibly containing embedded NUL bytes).
+The pcreposix interface provides "POSIX" semantics by default
+but has a familiar POSIX-friendly interface that may be more
+comfortable (or at least familiar) to use.
 
-This is a BSDism, but since it's not too horribly difficult to
-implement and it improves regex.h compatibility go ahead and
-implement it.
+However, users of PCRE and/or Perl are probably not expecting
+"POSIX" semantics for regular expressions.
 
-To implement this the following changes are effected:
+So it becomes a quandry, use the "POSIX-friendly" interface
+that may already be familiar and easy to code to but give up
+PCRE/Perl semantics OR learn a new, possibly unfamiliar
+interface in order to get "familiar" PCRE/Perl regular
+expression semantics.
 
-1. A new PCRE_ALLOW_EMBEDDED_NUL option is provided.
+To alleviate this problem, introduce the "REG_PCRE" option
+with these benefits:
 
-   This only provides part of the support in that while
-   it allows embedded NULs (they are lexically treated as
-   \000 literal code point matches both inside and
-   outside of character classes only), it still requires
-   the pattern to have a terminating NUL.
+* It's one of the shortest "REG_..." names  :)
+* It makes code using it self-documenting about what's going on
+* When it's not used and only "POSIX" "REG_..." names are used
+  then mostly only "POSIX" behavior occurs which also helps
+  reduce confusion.
 
-   Secondly this option provides a means to pass the
-   pattern in as a starting pointer and an ending pointer
-   which MUST be >= the staring pointer and MUST point to
-   a NUL byte if it's > the starting pointer.  If not, a
-   bad options error (ERR17) is immediately returned.
+But, there are some useful PCRE options that are not currently
+accessible via the pcreposix option and for REG_PCRE to be fully
+usable in a true "PCRE" mode they need to be provided as well.
 
-   Look at the code to see how this is accomplished
-   without altering the function signatures.  Be warned
-   though that your eyes might POP RIGHT OUT OF YOUR HEAD
-   when you look at it!  ;)
+Therefore effect the following changes to pcreposix:
 
-2. The BSDish REG_PEND option is provided that works as
-   follows:
+1. Introduce "REG_PCRE" with the following behavior:
 
-   If the re_endp pointer is less than the pattern pointer
-   an immediate REG_INVARG error is returned.
+   a) Setting REG_PCRE implies REG_EXTENDED which means that
+      PCRE_POSIC_BASIC_ESC will no longer be set for
+      !REG_EXTENDED.  No BREs with REG_PCRE.
+   b) Setting REG_PCRE makes REG_NEWLINE strictly an
+      alias for REG_MULTILINE.  In other words all of
+      the extra "macro" logic to activate the various "POSIX"
+      semantics PCRE options for !REG_NEWLINE and REG_NEWLINE
+      is disabled.  This means that !REG_NEWLINE will no longer
+      force PCRE_DOTALL|PCRE_DOLLAR_END_ONLY and REG_NEWLINE
+      will only set PCRE_MULTILINE but will no longer force
+      PCRE_NOT_EXCLUDES_NL.
 
-   Note that PCRE's ERR17 is also translated by pcreposix
-   to a REG_INVARG error.  This is not a coincidence.
+2. Introduce REG_EXPANDED as follows:
 
-   Otherwise a malloc'd buffer of re_endp-pattern+1 bytes
-   is allocated, the last byte is set to NUL and the
-   PCRE_ALLOW_EMBEDDED_NUL option is passed.  The buffer
-   is immediately freed after the compile call since any
-   error offets are still valid for the original, uncopied
-   pattern.
+   a) Maps directly to PCRE_EXTENDED
+   b) May be used with or without REG_PCRE
+   c) May be used with or without REG_EXTENDED
+   d) Ditto for all the other options
 
-   Except, the following two optimizations are done to avoid
-   needing to make a malloc'd + NUL copy in some cases:
+3. Introduce REG_DOLLARENDONLY as follows:
 
-    1. if pattern == re_endp then a static "" string is passed
-       and the REG_PEND option is ignored.
+   a) Maps directly to PCRE_DOLLAR_END_ONLY
+   b) Makes this accessible in REG_PCRE mode
+   c) Still implied by !REG_PCRE && !REG_NEWLINE
+   d) Not available on 16-bit wide "int" type platorms
 
-    2. if re_endp and (re_endp - 1) are in the same 1K page
-       then *re_endp is checked and if it's already a NUL
-       then no copy is made.  This should be safe on all
-       platforms regardless of any memory protection settings.
+4. Introduce REG_ANCHORED as follows:
+
+   a) Maps directly to PCRE_ANCHORED
+   b) May be used independently of other options
+   c) Not available on 16-bit wide "int" type platorms
+
+With these changes it's easy to use the regcomp() function
+to get PCRE/Perl semantics:
+
+  * Always set REG_PCRE in the cflags argument to regcomp()
+  * For "(?i)" also set REG_ICASE
+  * For "(?s)" also set REG_DOTALL
+  * For "(?m)" also set REG_MULTILINE
+  * For "(?x)" also set REG_EXPANDED (look out for typos here)
+
+For non-NUL terminated and/or embedded NUL patterns and/or subjects
+use the REG_PEND and/or REG_STARTEND options respectively.
+
+With these changes "pcreposix" means and provides two different
+paradigms:
+
+ 1. "POSIX"-semantics regex.h implemented using the "PCRE" engine
+ 2. "PCRE"-semantics regex accessible via the "POSIX" regex.h API
+
+If the caller sticks to using only POSIX-defined "REG_..." options
+(and possibly the BSDism extensions), then behavior is strictly
+(mostly) POSIX -- in REG_EXTENDED mode most all of the PCRE/Perl
+extensions are available but since these extensions would either be
+invalid or undefined POSIX patterns the result is still POSIX semantics
+compatile.
+
+If the caller uses REG_PCRE then patterns behave as expected just like
+normal PCRE patterns but they are then available via the familiar
+POSIX regex.h API.
+
+Old code that expects the legacy "pcreposix" behavior need only start
+passing the "REG_PCRE" flag in calls to regcomp() in the cflags
+argument.
+
+To make that code work with both the legacy "pcreposix" implementation
+and the new implementation it should contain something like this:
+
+#include <pcreposix.h>
+#ifndef REG_PCRE
+/* pcreposix.c ignores unknown bits so passing REG_PCRE to a legacy
+** pcreposix implementation ends up doing nothing, but since those
+** are always in REG_PCRE mode anyway it works out as intended. */
+#define REG_PCRE ((int)0x8000) /* cast needed on 16-bit int platforms */
+#endif
+
+Then stick to using only the REG_ICASE, REG_NEWLINE (an alias for
+REG_MULTILINE when REG_PCRE is set) and REG_DOTALL options (or others
+that are POSIX or were available in legacy pcreposix.h such as the
+REG_STARTEND BSDism and REG_UTF8, REG_NOTEMPTY, REG_UNGREEDY and
+REG_UCP PCRE options).
 
 Note: This patch is licensed under the same terms as PCRE itself.
 
