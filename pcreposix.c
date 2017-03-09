@@ -274,16 +274,17 @@ int errorcode;
 int options = 0;
 int re_nsub = 0;
 
-if ((cflags & REG_ICASE) != 0)     options |= PCRE_CASELESS;
-if ((cflags & REG_MULTILINE) != 0) options |= PCRE_MULTILINE;
-if ((cflags & REG_DOTALL) != 0)    options |= PCRE_DOTALL;
-if ((cflags & REG_NOSUB) != 0)     options |= PCRE_NO_AUTO_CAPTURE;
-if ((cflags & REG_UTF8) != 0)      options |= PCRE_UTF8;
-if ((cflags & REG_UCP) != 0)       options |= PCRE_UCP;
-if ((cflags & REG_UNGREEDY) != 0)  options |= PCRE_UNGREEDY;
+if ((cflags & REG_ICASE) != 0)    options |= PCRE_CASELESS;
+#define REG_XXXLINE (REG_MULTILINE|REG_NEWLINE)
+if ((cflags & REG_XXXLINE) != 0)  options |= PCRE_MULTILINE;
+if ((cflags & REG_DOTALL) != 0)   options |= PCRE_DOTALL;
+if ((cflags & REG_NOSUB) != 0)    options |= PCRE_NO_AUTO_CAPTURE;
+if ((cflags & REG_UTF8) != 0)     options |= PCRE_UTF8;
+if ((cflags & REG_UCP) != 0)      options |= PCRE_UCP;
+if ((cflags & REG_UNGREEDY) != 0) options |= PCRE_UNGREEDY;
 
-if ((cflags & REG_NEWLINE) == 0)   options |= PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
-if ((cflags & REG_NEWLINE) != 0)   options |= PCRE_MULTILINE | PCRE_NOT_EXCLUDES_NL;
+if ((cflags & REG_NEWLINE) == 0)  options |= PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
+if ((cflags & REG_NEWLINE) != 0)  options |= PCRE_NOT_EXCLUDES_NL;
 
 preg->re_pcre = pcre_compile2(pattern, options, &errorcode, &errorptr,
   &erroffset, NULL);
