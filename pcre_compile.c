@@ -285,6 +285,12 @@ static const pcre_uchar sub_implicit_newline[] = {
   CHAR_BACKSLASH, CHAR_n, '\0' };
 
 
+/* Substitute for embedded literal NUL. */
+
+static const pcre_uchar sub_embedded_nul[] = {
+  CHAR_BACKSLASH, CHAR_0, CHAR_0, CHAR_0, '\0' };
+
+
 /* Tables of names of POSIX character classes and their lengths. The names are
 now all in a single string, to reduce the number of relocations when a shared
 library is dynamically loaded. The list of lengths is terminated by a zero
@@ -4490,6 +4496,7 @@ pcre_uchar *orig_code = code;
 pcre_uchar *tempcode;
 BOOL inescq = (cd->extended_options & PCRE_VERBATIM_BIT) != 0;
 BOOL basicre = (cd->extended_options & PCRE_POSIX_BASIC_ESC_BIT) != 0;
+BOOL embednul = (cd->extended_options & PCRE_ALLOW_EMBEDDED_NUL_BIT) != 0;
 BOOL groupsetfirstchar = FALSE;
 const pcre_uchar *ptr = *ptrptr;
 const pcre_uchar *tempptr;
@@ -4600,6 +4607,13 @@ for (;; ptr++)
     c = *ptr;
     }
 
+  if (c == CHAR_NULL && !inescq && embednul && ptr < cd->end_pattern)
+    {
+    nestptr = ptr + 1;
+    ptr = sub_embedded_nul;
+    c = *ptr;
+    }
+
   if (nestptr == NULL && !inescq && basicre)
     {
     if (c == CHAR_LEFT_PARENTHESIS || c == CHAR_RIGHT_PARENTHESIS ||
@@ -4692,7 +4706,8 @@ for (;; ptr++)
   /* If in \Q...\E, check for the end; if not, we have a literal. Otherwise an
   isolated \E is ignored. */
 
-  if (c != CHAR_NULL)
+  if (c != CHAR_NULL ||
+      (inescq && nestptr == NULL && embednul && ptr < cd->end_pattern))
     {
     if (c == CHAR_BACKSLASH && ptr[1] == CHAR_E &&
         (cd->extended_options & PCRE_VERBATIM_BIT) == 0)
@@ -4738,7 +4753,7 @@ for (;; ptr++)
     if (c == CHAR_NUMBER_SIGN)
       {
       ptr++;
-      while (*ptr != CHAR_NULL)
+      while (*ptr != CHAR_NULL || (nestptr == NULL && embednul && ptr < cd->end_pattern))
         {
         if (IS_NEWLINE(ptr))         /* For non-fixed-length newline cases, */
           {                          /* IS_NEWLINE sets cd->nllen. */
@@ -4766,7 +4781,9 @@ for (;; ptr++)
       ptr[2] == CHAR_NUMBER_SIGN && (!basicre || nestptr))
     {
     ptr += 3;
-    while (*ptr != CHAR_NULL && *ptr != CHAR_RIGHT_PARENTHESIS) ptr++;
+    while ((*ptr != CHAR_NULL ||
+            (nestptr == NULL && embednul && ptr < cd->end_pattern)) &&
+           *ptr != CHAR_RIGHT_PARENTHESIS) ptr++;
     if (*ptr == CHAR_NULL)
       {
       *errorcodeptr = ERR18;
@@ -5001,6 +5018,13 @@ for (;; ptr++)
       {
       nestptr = ptr - 1;
       ptr = sub_implicit_newline;
+      c = *ptr;
+      }
+
+    if (c == CHAR_NULL && nestptr == NULL && embednul && ptr < cd->end_pattern)
+      {
+      nestptr = ptr + 1;
+      ptr = sub_embedded_nul;
       c = *ptr;
       }
 
@@ -5579,7 +5603,10 @@ for (;; ptr++)
 
     while (((c = *(++ptr)) != CHAR_NULL ||
            (nestptr != NULL &&
-             (ptr = nestptr, nestptr = NULL, c = *(++ptr)) != CHAR_NULL)) &&
+             (ptr = nestptr, nestptr = NULL, c = *(++ptr)) != CHAR_NULL) ||
+           (inescq && embednul && ptr < cd->end_pattern) ||
+           (embednul && ptr < cd->end_pattern &&
+             (nestptr = ptr + 1, ptr = sub_embedded_nul, c = *(++ptr)) != CHAR_NULL)) &&
            (c != CHAR_RIGHT_SQUARE_BRACKET || inescq));
 
     /* Check for missing terminating ']' */
@@ -5772,7 +5799,7 @@ for (;; ptr++)
         while (MAX_255(*p) && (cd->ctypes[*p] & ctype_space) != 0) p++;
         if (*p != CHAR_NUMBER_SIGN) break;
         p++;
-        while (*p != CHAR_NULL)
+        while (*p != CHAR_NULL || (nestptr == NULL && embednul && p < cd->end_pattern))
           {
           if (IS_NEWLINE(p))         /* For non-fixed-length newline cases, */
             {                        /* IS_NEWLINE sets cd->nllen. */
@@ -7796,6 +7823,8 @@ for (;; ptr++)
     tempbracount = cd->bracount;          /* Save value before bracket */
     length_prevgroup = 0;                 /* Initialize for pre-compile phase */
 
+    if (embednul && nestptr != NULL)
+      cd->extended_options &= ~PCRE_ALLOW_EMBEDDED_NUL_BIT;
     if (!compile_regex(
          newoptions,                      /* The complete new option state */
          &tempcode,                       /* Where to put code (updated) */
@@ -7817,6 +7846,8 @@ for (;; ptr++)
            &length_prevgroup              /* Pre-compile phase */
          ))
       goto FAILED;
+    if (embednul && nestptr != NULL)
+      cd->extended_options |= PCRE_ALLOW_EMBEDDED_NUL_BIT;
 
     cd->parens_depth -= 1;
 
@@ -9107,6 +9138,7 @@ size_t size;
 pcre_uchar *code;
 const pcre_uchar *codestart;
 const pcre_uchar *ptr;
+const pcre_uchar *endptr;
 compile_data compile_block;
 compile_data *cd = &compile_block;
 
@@ -9167,6 +9199,7 @@ if ((options & ~(PUBLIC_COMPILE_OPTIONS | PUBLIC_EXTENDED_COMPILE_OPTIONS)) != 0
     (((options & PCRE_XC1OPTIONS) == 0) &&
      (options & (PUBLIC_EXTENDED_COMPILE_OPTIONS & ~PCRE_XC1OPTIONS)) != 0))
   {
+  BADOPTIONS:
   errorcode = ERR17;
   goto PCRE_EARLY_ERROR_RETURN;
   }
@@ -9175,6 +9208,54 @@ if ((options & ~(PUBLIC_COMPILE_OPTIONS | PUBLIC_EXTENDED_COMPILE_OPTIONS)) != 0
 
 options2 = options & (PUBLIC_EXTENDED_COMPILE_OPTIONS & ~PCRE_XC1OPTIONS);
 options &= ~PUBLIC_EXTENDED_COMPILE_OPTIONS;
+
+/*
+***
+*** LOOK AWAY NOW!!!  YOUR EYES WILL BUG OUT OF YOUR HEAD IF YOU DON'T!!!  ;)
+***
+*/
+/* Handle PCRE_ALLOW_EMBEDDED_NUL_BIT here. */
+
+if (options2 & PCRE_ALLOW_EMBEDDED_NUL_BIT)
+  {
+# define ISXDIG(x) (digitab[x] & ctype_xdigit)
+# define XVAL(x) (IS_DIGIT(x)?((x)&0xf):(((x)+0x9)&0xf)) /* ASCII or EBCDIC */
+# define XPTR(x) ((const pcre_uchar *)(void *)(uintptr_t)(x))
+  const unsigned char *uptr = (const unsigned char *)pattern;
+  const pcre_uchar **vptrs;
+  uintptr_t vinfo = 0;
+  int xdigcnt = sizeof(void *) * 2;
+
+  while (xdigcnt && ISXDIG(*uptr))
+    {
+    vinfo <<= 4;
+    vinfo |= XVAL(*uptr);
+    ++uptr;
+    --xdigcnt;
+    }
+  if (xdigcnt || *uptr) goto BADOPTIONS;
+  vptrs = (const pcre_uchar **)XPTR(vinfo);
+  if (vptrs[0] != XPTR(0x4841434b /* odd magic number ;) */) ||
+      vptrs[1] != XPTR(0x01010101 /* version number one */))
+    goto BADOPTIONS;
+
+  endptr = vptrs[3];
+  if (vptrs[2] == endptr)
+    {
+    /* only case where trailing NUL may be omitted */
+    ptr = sub_embedded_nul + 4; /* sub_embedded_nul is always "\\000\0" */
+    options2 &= ~PCRE_ALLOW_EMBEDDED_NUL_BIT;
+    }
+  else
+    {
+    if (*endptr) goto BADOPTIONS;
+    }
+  ptr = vptrs[2];
+  pattern = (const char *)ptr;
+# undef ISXDIG
+# undef XVAL
+# undef XPTR
+  }
 
 /* If PCRE_NEVER_UTF is set, remember it. */
 
@@ -9409,7 +9490,10 @@ cd->workspace_size = COMPILE_WORK_SIZE;
 cd->named_groups = named_groups;
 cd->named_group_list_size = NAMED_GROUP_LIST_SIZE;
 cd->start_pattern = (const pcre_uchar *)pattern;
-cd->end_pattern = (const pcre_uchar *)(pattern + STRLEN_UC((const pcre_uchar *)pattern));
+if (options2 & PCRE_ALLOW_EMBEDDED_NUL_BIT)
+  cd->end_pattern = endptr;
+else
+  cd->end_pattern = (const pcre_uchar *)(pattern + STRLEN_UC((const pcre_uchar *)pattern));
 cd->req_varyopt = 0;
 cd->parens_depth = 0;
 cd->assert_depth = 0;

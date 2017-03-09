@@ -235,6 +235,10 @@ by "configure". */
 #include <inttypes.h>
 #endif
 
+#if !defined(UINTPTR_MAX) && !defined(uintptr_t) && !defined(HAVE_INTTYPES_H)
+#error Cannot determine a type for pointer-sized unsigned integers
+#endif
+
 #if defined INT64_MAX || defined int64_t
 #define INT64_OR_DOUBLE int64_t
 #else
@@ -1124,12 +1128,14 @@ bits are present -- at least one reused non-public API bit must also be set. */
 
 #define PCRE_XC1OPTIONS    0x40000000  /* extended compile-only public api */
 
-#define PCRE_NOT_EXCLUDES_NL_BIT  (PCRE_NOT_EXCLUDES_NL & ~PCRE_XC1OPTIONS)
-#define PCRE_POSIX_BASIC_ESC_BIT  (PCRE_POSIX_BASIC_ESC & ~PCRE_XC1OPTIONS)
-#define PCRE_VERBATIM_BIT         (PCRE_VERBATIM        & ~PCRE_XC1OPTIONS)
+#define PCRE_NOT_EXCLUDES_NL_BIT    (PCRE_NOT_EXCLUDES_NL    & ~PCRE_XC1OPTIONS)
+#define PCRE_POSIX_BASIC_ESC_BIT    (PCRE_POSIX_BASIC_ESC    & ~PCRE_XC1OPTIONS)
+#define PCRE_VERBATIM_BIT           (PCRE_VERBATIM           & ~PCRE_XC1OPTIONS)
+#define PCRE_ALLOW_EMBEDDED_NUL_BIT (PCRE_ALLOW_EMBEDDED_NUL & ~PCRE_XC1OPTIONS)
 
 #define PUBLIC_EXTENDED_COMPILE_OPTIONS \
-   (PCRE_NOT_EXCLUDES_NL|PCRE_POSIX_BASIC_ESC|PCRE_VERBATIM)
+   (PCRE_NOT_EXCLUDES_NL|PCRE_POSIX_BASIC_ESC|PCRE_VERBATIM| \
+    PCRE_ALLOW_EMBEDDED_NUL)
 
 #if (PUBLIC_COMPILE_OPTIONS & PUBLIC_EXTENDED_COMPILE_OPTIONS) != 0
 #error PUBLIC_EXTENDED_COMPILE_OPTIONS conflicts with PUBLIC_COMPILE_OPTIONS

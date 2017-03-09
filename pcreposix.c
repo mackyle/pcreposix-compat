@@ -269,12 +269,70 @@ PCREPOSIX_EXP_DEFN int PCRE_CALL_CONVENTION
 regcomp(regex_t *preg, const char *pattern, int cflags)
 {
 const char *errorptr;
+char *dupez = NULL;
 int erroffset;
 int errorcode;
 int options = 0;
 int re_nsub = 0;
+const char *vptrs[4];
+char altpattern[(sizeof(void *) * 2) + 1];
 
+if (preg == NULL) return REG_INVARG;
+preg->re_pcre = NULL;
+
+if ((cflags & REG_PEND) != 0)
+  {
+  uintptr_t page1, page2, ptr;
+  int i;
+
+  if (preg->re_endp < pattern) return REG_INVARG;
+  if (pattern == preg->re_endp)
+    {
+    pattern = "";
+    cflags &= ~REG_PEND;
+    goto CHECK_OPTS;
+    }
+  if (pattern == NULL) return REG_INVARG;
+# define PAGE1KM1 ((uintptr_t)(1024U-1U))
+  page2 = (uintptr_t)(void *)preg->re_endp;
+  page1 = page2 - 1U;
+  page1 &= ~PAGE1KM1;
+  page2 &= ~PAGE1KM1;
+# undef PAGE1KM1
+  if (page1 == page2 && *(preg->re_endp) == 0)
+    {
+    vptrs[2] = pattern;
+    vptrs[3] = preg->re_endp;
+    goto BUILD_PTRS;
+    }
+  dupez = (char *)malloc((preg->re_endp - pattern) + 1);
+  if (!dupez) return REG_ESPACE;
+  vptrs[2] = dupez;
+  vptrs[3] = dupez + (preg->re_endp - pattern);
+  memcpy(dupez, pattern, preg->re_endp - pattern);
+  dupez[preg->re_endp - pattern] = 0;
+  BUILD_PTRS:
+# define XPTR(x) ((const char *)(void *)(uintptr_t)(x))
+  vptrs[0] = XPTR(0x4841434b /* odd magic number ;) */);
+  vptrs[1] = XPTR(0x01010101 /* version number one */);
+# undef XPTR
+  ptr = (uintptr_t)(void *)&vptrs[0];
+  i = sizeof(void *) * 2;
+  altpattern[i] = 0;
+  while (i--)
+    {
+    unsigned nibble = ptr & 0xf;
+    ptr >>= 4;
+    altpattern[i] = (nibble <= 9) ? (CHAR_0 + nibble) : (CHAR_a + (nibble - 10));
+    }
+  pattern = altpattern;
+  }
+else if (pattern == NULL) return REG_INVARG;
+
+CHECK_OPTS:
 if ((cflags & REG_EXTENDED) == 0)  options |= PCRE_POSIX_BASIC_ESC;
+
+if ((cflags & REG_PEND) != 0)      options |= PCRE_ALLOW_EMBEDDED_NUL;
 
 if ((cflags & REG_ICASE) != 0)     options |= PCRE_CASELESS;
 if ((cflags & REG_MULTILINE) != 0) options |= PCRE_MULTILINE;
@@ -291,6 +349,7 @@ if ((cflags & REG_NEWLINE) != 0)   options |= PCRE_MULTILINE | PCRE_NOT_EXCLUDES
 preg->re_pcre = pcre_compile2(pattern, options, &errorcode, &errorptr,
   &erroffset, NULL);
 preg->re_erroffset = erroffset;
+if (dupez) free(dupez);
 
 /* Safety: if the error code is too big for the translation vector (which
 should not happen, but we all make mistakes), return REG_BADPAT. */

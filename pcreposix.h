@@ -59,6 +59,8 @@ extern "C" {
 #define REG_DOTALL    0x0010   /* NOT defined by POSIX; maps to PCRE_DOTALL */
 #define REG_NOSUB     0x0020   /* Maps to PCRE_NO_AUTO_CAPTURE */
 #define REG_UTF8      0x0040   /* NOT defined by POSIX; maps to PCRE_UTF8 */
+/* These next two overlap since there's no conflict */
+#define REG_PEND      0x0080   /* BSD feature: pattern ends at re_endp addr */
 #define REG_STARTEND  0x0080   /* BSD feature: pass subject string by so,eo */
 #define REG_NOTEMPTY  0x0100   /* NOT defined by POSIX; maps to PCRE_NOTEMPTY */
 #define REG_UNGREEDY  0x0200   /* NOT defined by POSIX; maps to PCRE_UNGREEDY */
@@ -98,6 +100,7 @@ typedef struct {
   void *re_pcre;
   size_t re_nsub;
   size_t re_erroffset;
+  const char *re_endp; /* REG_PEND only */
 } regex_t;
 
 /* The structure in which a captured offset is returned. */
