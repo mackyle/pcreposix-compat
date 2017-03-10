@@ -151,7 +151,15 @@ typedef struct {
 
 /* The structure in which a captured offset is returned. */
 
-typedef int regoff_t;
+/* POSIX requires this be a signed int type that can hold the largest value of
+either an ssize_t or a ptrdiff_t type.  A long will do nicely on all but LLP64
+architectures where a long long is needed instead. */
+
+#if defined(__LLP64__) || defined(_WIN64)
+typedef long long regoff_t;
+#else
+typedef long regoff_t;
+#endif
 
 typedef struct {
   regoff_t rm_so;

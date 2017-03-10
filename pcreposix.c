@@ -399,7 +399,8 @@ PCREPOSIX_EXP_DEFN int PCRE_CALL_CONVENTION
 regexec(const regex_t *preg, const char *string, size_t nmatch,
   regmatch_t pmatch[], int eflags)
 {
-int rc, so, eo;
+int rc, len;
+size_t so, eo;
 int options = 0;
 int *ovector = NULL;
 int small_ovector[POSIX_MALLOC_THRESHOLD * 3];
@@ -442,16 +443,21 @@ start location rather than being passed as a PCRE "starting offset". */
 if ((eflags & REG_STARTEND) != 0)
   {
   if (pmatch == NULL) return REG_INVARG;
-  so = pmatch[0].rm_so;
-  eo = pmatch[0].rm_eo;
+  if (pmatch[0].rm_so < 0 || pmatch[0].rm_eo < pmatch[0].rm_so) return REG_INVARG;
+  so = (size_t)pmatch[0].rm_so;
+  eo = (size_t)pmatch[0].rm_eo;
+  if ((regoff_t)so != pmatch[0].rm_so || (regoff_t)eo != pmatch[0].rm_eo)
+    return REG_INVARG;
   }
 else
   {
   so = 0;
-  eo = (int)strlen(string);
+  eo = strlen(string);
   }
 
-rc = pcre_exec((const pcre *)preg->re_pcre, NULL, string + so, (eo - so),
+len = (int)(eo - so);
+if ((size_t)len != (eo - so)) return REG_INVARG;
+rc = pcre_exec((const pcre *)preg->re_pcre, NULL, string + so, len,
   0, options, ovector, (int)(nmatch * 3));
 
 if (rc == 0) rc = (int)nmatch;    /* All captured slots were filled in */
@@ -465,8 +471,8 @@ if (rc >= 0)
     {
     for (i = 0; i < (size_t)rc; i++)
       {
-      pmatch[i].rm_so = ovector[i*2];
-      pmatch[i].rm_eo = ovector[i*2+1];
+      pmatch[i].rm_so = (regoff_t)ovector[i*2];
+      pmatch[i].rm_eo = (regoff_t)ovector[i*2+1];
       }
     if (allocated_ovector) free(ovector);
     for (; i < nmatch; i++) pmatch[i].rm_so = pmatch[i].rm_eo = -1;
