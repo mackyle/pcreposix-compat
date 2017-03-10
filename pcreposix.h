@@ -122,26 +122,23 @@ but on such a platform these constants will end up having type long instead. */
 
 /* Error values. Not all these are relevant or used by the wrapper. */
 
-enum {
-  REG_ASSERT = 1,  /* internal error ? */
-  REG_BADBR,       /* invalid repeat counts in {} */
-  REG_BADPAT,      /* pattern error */
-  REG_BADRPT,      /* ? * + invalid */
-  REG_EBRACE,      /* unbalanced {} */
-  REG_EBRACK,      /* unbalanced [] */
-  REG_ECOLLATE,    /* collation error - not relevant */
-  REG_ECTYPE,      /* bad class */
-  REG_EESCAPE,     /* bad escape sequence */
-  REG_EMPTY,       /* empty expression */
-  REG_EPAREN,      /* unbalanced () */
-  REG_ERANGE,      /* bad range inside [] */
-  REG_ESIZE,       /* expression too big */
-  REG_ESPACE,      /* failed to get memory */
-  REG_ESUBREG,     /* bad back reference */
-  REG_INVARG,      /* bad argument */
-  REG_NOMATCH      /* match failed */
-};
-
+#define REG_ASSERT       1   /* internal error ? */
+#define REG_BADBR        2   /* invalid repeat counts in {} */
+#define REG_BADPAT       3   /* pattern error */
+#define REG_BADRPT       4   /* ? * + invalid */
+#define REG_EBRACE       5   /* unbalanced {} */
+#define REG_EBRACK       6   /* unbalanced [] */
+#define REG_ECOLLATE     7   /* collation error - not relevant */
+#define REG_ECTYPE       8   /* bad class */
+#define REG_EESCAPE      9   /* bad escape sequence */
+#define REG_EMPTY       10   /* empty expression */
+#define REG_EPAREN      11   /* unbalanced () */
+#define REG_ERANGE      12   /* bad range inside [] */
+#define REG_ESIZE       13   /* expression too big */
+#define REG_ESPACE      14   /* failed to get memory */
+#define REG_ESUBREG     15   /* bad back reference */
+#define REG_INVARG      16   /* bad argument */
+#define REG_NOMATCH     17   /* match failed */
 
 /* The structure representing a compiled regular expression. */
 
