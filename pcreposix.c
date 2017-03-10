@@ -473,6 +473,11 @@ if (rc >= 0)
       {
       pmatch[i].rm_so = (regoff_t)ovector[i*2];
       pmatch[i].rm_eo = (regoff_t)ovector[i*2+1];
+      if (pmatch[i].rm_so >= 0 && pmatch[i].rm_eo >= 0)
+        {
+        pmatch[i].rm_so += (regoff_t)so;
+        pmatch[i].rm_eo += (regoff_t)so;
+        }
       }
     if (allocated_ovector) free(ovector);
     for (; i < nmatch; i++) pmatch[i].rm_so = pmatch[i].rm_eo = -1;
