@@ -7,6 +7,8 @@ and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
            Copyright (c) 1997-2016 University of Cambridge
+           Copyright (c) 2017 Kyle J. McKay <mackyle@gmail.com>
+           All Rights Reserved
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -330,7 +332,8 @@ if ((cflags & REG_PEND) != 0)
 else if (pattern == NULL) return REG_INVARG;
 
 CHECK_OPTS:
-if ((cflags & REG_EXTENDED) == 0) options |= PCRE_POSIX_BASIC_ESC;
+#define USE_EXTENDED (REG_EXTENDED|REG_PCRE)
+if ((cflags & USE_EXTENDED) == 0) options |= PCRE_POSIX_BASIC_ESC;
 
 if ((cflags & REG_PEND) != 0)     options |= PCRE_ALLOW_EMBEDDED_NUL;
 
@@ -343,9 +346,16 @@ if ((cflags & REG_UTF8) != 0)     options |= PCRE_UTF8;
 if ((cflags & REG_UCP) != 0)      options |= PCRE_UCP;
 if ((cflags & REG_UNGREEDY) != 0) options |= PCRE_UNGREEDY;
 if ((cflags & REG_NOSPEC) != 0)   options |= PCRE_VERBATIM;
+if ((cflags & REG_EXPANDED) != 0) options |= PCRE_EXTENDED;
+/* These ones only work on platforms where ints are wider than 16 bits */
+if ((cflags & REG_DOLLARENDONLY) != 0) options |= PCRE_DOLLAR_ENDONLY;
+if ((cflags & REG_ANCHORED) != 0) options |= PCRE_ANCHORED;
 
-if ((cflags & REG_NEWLINE) == 0)  options |= PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
-if ((cflags & REG_NEWLINE) != 0)  options |= PCRE_NOT_EXCLUDES_NL;
+if ((cflags & REG_PCRE) == 0)
+  {
+  if ((cflags & REG_NEWLINE) == 0)  options |= PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
+  if ((cflags & REG_NEWLINE) != 0)  options |= PCRE_NOT_EXCLUDES_NL;
+  }
 
 preg->re_pcre = pcre_compile2(pattern, options, &errorcode, &errorptr,
   &erroffset, NULL);
