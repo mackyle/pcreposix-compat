@@ -1,13 +1,12 @@
 From: Kyle J. McKay <mackyle@gmail.com>
-Subject: [PATCH] pcreposix.h: use error #define's not enum
+Subject: [PATCH] pcreposix: make regoff_t more POSIX friendly
 
-To be strictly POSIX compatible, the error number constants
-must be declared using #define's NOT with an enum.
+The POSIX standard requires that the regoff_t be a signed integer
+type that can hold the largest value that can be stored in either a
+ptrdiff_t type or a ssize_t type.
 
-Make it so.
-
-Note that the actual error number values themselves remain
-unchanged.
+We can just use a long except on LLP64 architectures and we need
+only check two defines for those in which case we need a long long.
 
 Note: This patch is licensed under the same terms as PCRE itself.
 
