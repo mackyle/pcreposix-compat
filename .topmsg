@@ -39,7 +39,7 @@ Therefore effect the following changes to pcreposix:
       the extra "macro" logic to activate the various "POSIX"
       semantics PCRE options for !REG_NEWLINE and REG_NEWLINE
       is disabled.  This means that !REG_NEWLINE will no longer
-      force PCRE_DOTALL|PCRE_DOLLAR_END_ONLY and REG_NEWLINE
+      force PCRE_DOTALL|PCRE_DOLLAR_ENDONLY and REG_NEWLINE
       will only set PCRE_MULTILINE but will no longer force
       PCRE_NOT_EXCLUDES_NL.
 
@@ -52,7 +52,7 @@ Therefore effect the following changes to pcreposix:
 
 3. Introduce REG_DOLLARENDONLY as follows:
 
-   a) Maps directly to PCRE_DOLLAR_END_ONLY
+   a) Maps directly to PCRE_DOLLAR_ENDONLY
    b) Makes this accessible in REG_PCRE mode
    c) Still implied by !REG_PCRE && !REG_NEWLINE
    d) Not available on 16-bit wide "int" type platorms
@@ -86,7 +86,7 @@ If the caller sticks to using only POSIX-defined "REG_..." options
 (mostly) POSIX -- in REG_EXTENDED mode most all of the PCRE/Perl
 extensions are available but since these extensions would either be
 invalid or undefined POSIX patterns the result is still POSIX semantics
-compatile.
+compatible.
 
 If the caller uses REG_PCRE then patterns behave as expected just like
 normal PCRE patterns but they are then available via the familiar
