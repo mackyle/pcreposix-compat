@@ -1,6 +1,6 @@
-/*************************************************
-*       Perl-Compatible Regular Expressions      *
-*************************************************/
+/**********************************************************
+*       Perl-Compatible Regular Expressions + POSIX       *
+***********************************************************/
 
 #ifndef _PCREPOSIX_H
 #define _PCREPOSIX_H
@@ -9,8 +9,8 @@
 Compatible Regular Expression library. It defines the things POSIX says should
 be there. I hope.
 
-            Copyright (c) 1997-2012 University of Cambridge
-            Copyright (c) 2017 Kyle J. McKay <mackyle@gmail.com>
+            Copyright (C) 1997-2012 University of Cambridge
+            Copyright (C) 2017 Kyle J. McKay <mackyle@gmail.com>
             All Rights Reserved
 
 -----------------------------------------------------------------------------
@@ -42,7 +42,9 @@ POSSIBILITY OF SUCH DAMAGE.
 -----------------------------------------------------------------------------
 */
 
-/* Have to include stdlib.h in order to ensure that size_t is defined. */
+/* Have to include stdlib.h or stddef.h in order to ensure that size_t is
+** defined, but stdlib.h has historically been used and may be more
+** ubiquitous and therefore more compatible so it's still used here. */
 
 #include <stdlib.h>
 
@@ -52,31 +54,47 @@ POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
-/* Options, mostly defined by POSIX, but with some extras. */
+/*
+** regcomp options
+**
+** mostly defined by POSIX, but with some extras
+*/
 
-#define REG_ICASE     0x0001   /* Maps to PCRE_CASELESS */
-#define REG_NEWLINE   0x0002   /* Affects four different PCRE options */
-#define REG_NOTBOL    0x0004   /* Maps to PCRE_NOTBOL */
-#define REG_NOTEOL    0x0008   /* Maps to PCRE_NOTEOL */
-#define REG_DOTALL    0x0010   /* NOT defined by POSIX; maps to PCRE_DOTALL */
-#define REG_NOSUB     0x0020   /* Maps to PCRE_NO_AUTO_CAPTURE */
-#define REG_UTF8      0x0040   /* NOT defined by POSIX; maps to PCRE_UTF8 */
-/* These next two overlap since there's no conflict */
-#define REG_PEND      0x0080   /* BSD feature: pattern ends at re_endp addr */
-#define REG_STARTEND  0x0080   /* BSD feature: pass subject string by so,eo */
-#define REG_NOTEMPTY  0x0100   /* NOT defined by POSIX; maps to PCRE_NOTEMPTY */
-#define REG_UNGREEDY  0x0200   /* NOT defined by POSIX; maps to PCRE_UNGREEDY */
-#define REG_UCP       0x0400   /* NOT defined by POSIX; maps to PCRE_UCP */
-#define REG_MULTILINE 0x0800   /* NOT defined by POSIX; maps to PCRE_MULTILINE */
-#define REG_NOSPEC    0x2000   /* BSD feature: treat pattern as literal string */
-#define REG_EXPANDED  0x4000   /* NOT defined by POSIX; maps to PCRE_EXTENDED */
+#define REG_BASIC      0        /* BSD compatibility define */
 
-#define REG_BASIC     0        /* BSD define */
-#define REG_EXTENDED  0x1000   /* Maps to !PCRE_POSIX_BASIC_ESC */
+#define REG_ICASE      0x0001   /* Maps to PCRE_CASELESS */
+#define REG_NEWLINE    0x0002   /* Affects four different PCRE options */
+#define REG_MULTILINE  0x0004   /* NOT defined by POSIX; maps to PCRE_MULTILINE */
+#define REG_EXPANDED   0x0008   /* NOT defined by POSIX; maps to PCRE_EXTENDED */
+#define REG_DOTALL     0x0010   /* NOT defined by POSIX; maps to PCRE_DOTALL */
+#define REG_NOSUB      0x0020   /* Maps to PCRE_NO_AUTO_CAPTURE */
+#define REG_UTF8       0x0040   /* NOT defined by POSIX; maps to PCRE_UTF8 */
+#define REG_PEND       0x0080   /* BSD feature: pattern ends at re_endp addr */
+#define REG_EXTENDED   0x0100   /* Maps to !PCRE_POSIX_BASIC_ESC */
+#define REG_UNGREEDY   0x0200   /* NOT defined by POSIX; maps to PCRE_UNGREEDY */
+#define REG_UCP        0x0400   /* NOT defined by POSIX; maps to PCRE_UCP */
+#define REG_DENDONLY   0x0800   /* Maps to PCRE_DOLLAR_ENDONLY */
+#define REG_ANCHORED   0x1000   /* Maps to PCRE_ANCHORED */
+#define REG_NOSPEC     0x2000   /* BSD feature: treat pattern as literal string */
+#define REG_JAVASCPT   0x4000   /* Maps to PCRE_JAVASCRIPT_COMPAT + REG_PCRE */
+#define REG_PCRE ((int)0x8000)  /* cast needed with 16-bit ints */
 
-/* REG_PCRE and friends */
+/*
+** regexec options
+**
+** mostly defined by POSIX, but with some extras
+*/
 
-/* When REG_PCRE is set in the cflags (3rd) argument to the regcomp function
+#define REG_NOTBOL     0x0004   /* Maps to PCRE_NOTBOL */
+#define REG_NOTEOL     0x0008   /* Maps to PCRE_NOTEOL */
+#define REG_STARTEND   0x0080   /* BSD feature: pass subject string by so,eo */
+#define REG_NOTEMPTY   0x0100   /* NOT defined by POSIX; maps to PCRE_NOTEMPTY */
+
+/*
+** REG_PCRE and friends
+**
+
+When REG_PCRE is set in the cflags (3rd) argument to the regcomp function
 then the following behavior occurs:
 
 (The notation "!REG_EXTENDED" below means the "REG_EXTENDED" flag was NOT
@@ -92,11 +110,8 @@ then the following behavior occurs:
      disabled.  This means that !REG_NEWLINE will no longer force both
      PCRE_DOTALL and PCRE_DOLLAR_ENDONLY and REG_NEWLINE will only set
      PCRE_MULTILINE but will no longer force PCRE_NOT_EXCLUDES_NL.
-*/
 
-#define REG_PCRE          ((int) 0x8000)   /* cast needed with 16-bit ints */
-
-/* The following table may be helpful when using REG_PCRE:
+The following table may be helpful when using REG_PCRE:
 
   PCRE & Perl  Option to use for regcomp  POSIX   REG_PCRE/!REG_PCRE Defaults
   -----------  -------------------------  ------  -----------------------------
@@ -108,17 +123,10 @@ then the following behavior occurs:
 In !REG_PCRE (aka POSIX) mode, !REG_NEWLINE sets both PCRE_DOTALL and
 PCRE_DOLLAR_ENDONLY whereas REG_NEWLINE sets both PCRE_MULTILINE and
 PCRE_NOT_EXCLUDES_NL.  In REG_PCRE (aka PCRE) mode, REG_NEWLINE is strictly
-an alias for REG_MULTILINE (all magic macro logic is disabled). */
+an alias for REG_MULTILINE (all magic macro logic is disabled).
 
-/* The friends of REG_PCRE (only available when int is wider than 16 bits) */
-
-/* Note that a cast to int is NOT included so that if any of these are used on
-a 16-bit int platform, the compiler should catch it since the POSIX
-specification for the regcomp function has the cflags parameter as an int
-but on such a platform these constants will end up having type long instead. */
-
-#define REG_DOLLARENDONLY 0x00010000       /* Maps to PCRE_DOLLAR_ENDONLY */
-#define REG_ANCHORED      0x00020000       /* Maps to PCRE_ANCHORED */
+Setting REG_JAVASCPT implies REG_PCRE.  All the comments above about REG_PCRE
+also apply to REG_JAVASCPT but REG_JAVASCPT also sets PCRE_JAVASCRIPT_COMPAT. */
 
 /* Error values. Not all these are relevant or used by the wrapper. */
 
