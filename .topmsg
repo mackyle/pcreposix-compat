@@ -1,0 +1,16 @@
+From: Kyle J. McKay <mackyle@gmail.com>
+Subject: [PATCH] pcreposix: bump version and include location
+
+In order to avoid disrupting existing users of the previous
+pcreposix library, bump the major version so that both the
+new and old libraries can coexist simultaneously.
+
+In addition, since the include file is a bit different and
+is now fully POSIX compatible, move it from pcreposix.h
+to pcreposix/pcreposix.h with a pcreposix/regex.h alias.
+
+In this way a simple -I option can allow it to be used
+as a regex.h replacement and again the new location can
+co-exist with the old location and old header.
+
+Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
