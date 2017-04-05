@@ -68,6 +68,16 @@ does so after it has set PCRE_EXP_DECL to "export" if it is not already set. */
 #include "pcre_internal.h"
 #include "pcreposix.h"
 
+/* Known option bits */
+
+#define REGCOMP_OPTIONS \
+  (REG_ICASE|REG_NEWLINE|REG_DOTALL|REG_NOSUB|REG_UTF8|REG_PEND|REG_UNGREEDY| \
+   REG_UCP|REG_MULTILINE|REG_NOSPEC|REG_EXPANDED|REG_BASIC|REG_EXTENDED| \
+   REG_PCRE|REG_DENDONLY|REG_ANCHORED|REG_JAVASCPT)
+
+#define REGEXEC_OPTIONS \
+  (REG_NOTBOL|REG_NOTEOL|REG_STARTEND|REG_NOTEMPTY)
+
 
 /* Table to translate PCRE compile time error codes into POSIX error codes. */
 
@@ -281,6 +291,7 @@ char altpattern[(sizeof(void *) * 2) + 1];
 
 if (preg == NULL) return REG_INVARG;
 preg->re_pcre = NULL;
+if ((cflags & REGCOMP_OPTIONS) != cflags) return REG_INVARG;
 
 if ((cflags & REG_PEND) != 0)
   {
@@ -332,7 +343,7 @@ if ((cflags & REG_PEND) != 0)
 else if (pattern == NULL) return REG_INVARG;
 
 CHECK_OPTS:
-#define USE_EXTENDED (REG_EXTENDED|REG_PCRE)
+#define USE_EXTENDED (REG_EXTENDED|REG_PCRE|REG_JAVASCPT)
 if ((cflags & USE_EXTENDED) == 0) options |= PCRE_POSIX_BASIC_ESC;
 
 if ((cflags & REG_PEND) != 0)     options |= PCRE_ALLOW_EMBEDDED_NUL;
@@ -348,10 +359,11 @@ if ((cflags & REG_UNGREEDY) != 0) options |= PCRE_UNGREEDY;
 if ((cflags & REG_NOSPEC) != 0)   options |= PCRE_VERBATIM;
 if ((cflags & REG_EXPANDED) != 0) options |= PCRE_EXTENDED;
 /* These ones only work on platforms where ints are wider than 16 bits */
-if ((cflags & REG_DOLLARENDONLY) != 0) options |= PCRE_DOLLAR_ENDONLY;
+if ((cflags & REG_DENDONLY) != 0) options |= PCRE_DOLLAR_ENDONLY;
 if ((cflags & REG_ANCHORED) != 0) options |= PCRE_ANCHORED;
+if ((cflags & REG_JAVASCPT) != 0) options |= PCRE_JAVASCRIPT_COMPAT;
 
-if ((cflags & REG_PCRE) == 0)
+if ((cflags & (REG_PCRE|REG_JAVASCPT)) == 0)
   {
   if ((cflags & REG_NEWLINE) == 0)  options |= PCRE_DOTALL | PCRE_DOLLAR_ENDONLY;
   if ((cflags & REG_NEWLINE) != 0)  options |= PCRE_NOT_EXCLUDES_NL;
@@ -404,7 +416,12 @@ int options = 0;
 int *ovector = NULL;
 int small_ovector[POSIX_MALLOC_THRESHOLD * 3];
 BOOL allocated_ovector = FALSE;
-BOOL nosub =
+BOOL nosub;
+
+if (preg == NULL) return REG_INVARG;
+if ((eflags & REGEXEC_OPTIONS) != eflags) return REG_INVARG;
+
+nosub =
   (REAL_PCRE_OPTIONS((const pcre *)preg->re_pcre) & PCRE_NO_AUTO_CAPTURE) != 0;
 
 if ((eflags & REG_NOTBOL) != 0) options |= PCRE_NOTBOL;
