@@ -281,8 +281,8 @@ static const pcre_uchar sub_end_of_word[] = {
 
 /* Substitute for implicit newline. */
 
-static const pcre_uchar sub_implicit_newline[] = {
-  CHAR_BACKSLASH, CHAR_n, '\0' };
+static const pcre_uchar sub_implicit_rsb_newline[] = {
+  CHAR_RIGHT_SQUARE_BRACKET, CHAR_BACKSLASH, CHAR_n, '\0' };
 
 
 /* Tables of names of POSIX character classes and their lengths. The names are
@@ -4962,12 +4962,23 @@ for (;; ptr++)
     memset(classbits, 0, 32 * sizeof(pcre_uint8));
 
     /* If the PCRE_NOT_EXCLUDES_NL option is set AND the class started with '^',
-    stuff an ESC_n into the character class then resume. */
+    stuff an ESC_n into the character class then resume.  However, [^] means
+    match any character in JS but not in Perl/PCRE so for JS [^] still becomes
+    [^\n] but [^]] in Perl/PCRE must become [^]\n] instead. */
 
     if (negate_class && nestptr == NULL && (cd->extended_options & PCRE_NOT_EXCLUDES_NL_BIT) != 0)
       {
-      nestptr = ptr - 1;
-      ptr = sub_implicit_newline;
+      if (c != CHAR_RIGHT_SQUARE_BRACKET ||
+          (cd->external_options & PCRE_JAVASCRIPT_COMPAT) != 0)
+        {
+        nestptr = ptr - 1;
+        ptr = sub_implicit_rsb_newline + 1;
+        }
+      else
+        {
+        nestptr = ptr;
+        ptr = sub_implicit_rsb_newline;
+        }
       c = *ptr;
       }
 
