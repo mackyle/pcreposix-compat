@@ -94,7 +94,7 @@ bin_PROGRAMS =
 noinst_PROGRAMS =
 
 # Additional files to delete on 'make clean' and 'make maintainer-clean'.
-CLEANFILES =
+CLEANFILES = regex.h
 MAINTAINERCLEANFILES =
 
 # Additional files to bundle with the distribution, over and above what
@@ -177,8 +177,15 @@ MAINTAINERCLEANFILES += pcre.h.generic config.h.generic
 # it is generated from pcre.h.in.
 nodist_include_HEADERS = \
   pcre.h
-include_HEADERS = \
+include_HEADERS =
+otherincludedir = $(includedir)/pcreposix
+otherinclude_HEADERS = \
   pcreposix.h
+nodist_otherinclude_HEADERS = \
+  regex.h
+
+regex.h : $(srcdir)/pcreposix.h
+	cp -p $(srcdir)/pcreposix.h $@
 
 # These additional headers will be be installed if C++ support is enabled. We
 # do not distribute pcrecpparg.h or pcre_stringpiece.h, as these are generated

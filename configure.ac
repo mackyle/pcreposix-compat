@@ -20,7 +20,7 @@ m4_define(pcre_date, [2017-01-11])
 m4_define(libpcre_version, [3:8:2])
 m4_define(libpcre16_version, [2:8:2])
 m4_define(libpcre32_version, [0:8:0])
-m4_define(libpcreposix_version, [0:4:0])
+m4_define(libpcreposix_version, [1:0:0])
 m4_define(libpcrecpp_version, [0:1:0])
 
 AC_PREREQ(2.57)

@@ -19667,7 +19667,7 @@ EXTRA_LIBPCRE32_LDFLAGS="$EXTRA_LIBPCRE32_LDFLAGS \
                        $NO_UNDEFINED -version-info 0:8:0"
 
 EXTRA_LIBPCREPOSIX_LDFLAGS="$EXTRA_LIBPCREPOSIX_LDFLAGS \
-                            $NO_UNDEFINED -version-info 0:4:0"
+                            $NO_UNDEFINED -version-info 1:0:0"
 
 EXTRA_LIBPCRECPP_LDFLAGS="$EXTRA_LIBPCRECPP_LDFLAGS \
                           $NO_UNDEFINED -version-info 0:1:0 \
