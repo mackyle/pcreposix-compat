@@ -813,6 +813,11 @@ LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
+M = 1
+M_ = X
+M_0 =
+M_1 = X
+MM = $(M_$(M))
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
@@ -1336,7 +1341,7 @@ all: $(BUILT_SOURCES) config.h
 .SUFFIXES: .c .cc .lo .log .o .obj .test .test$(EXEEXT) .trs
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+$(MM)$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -1362,11 +1367,11 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
 
-$(top_srcdir)/configure:  $(am__configure_deps)
+$(MM)$(top_srcdir)/configure:  $(am__configure_deps)
 	$(am__cd) $(srcdir) && $(AUTOCONF)
-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
+$(MM)$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
-$(am__aclocal_m4_deps):
+$(MM)$(am__aclocal_m4_deps):
 
 config.h: stamp-h1
 	@test -f $@ || rm -f stamp-h1
@@ -1375,7 +1380,7 @@ config.h: stamp-h1
 stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
 	@rm -f stamp-h1
 	cd $(top_builddir) && $(SHELL) ./config.status config.h
-$(srcdir)/config.h.in:  $(am__configure_deps)
+$(MM)$(srcdir)/config.h.in:  $(am__configure_deps)
 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
 	rm -f stamp-h1
 	touch $@
@@ -3186,7 +3191,7 @@ uninstall-man: uninstall-man1 uninstall-man3
 
 # The only difference between pcre.h.in and pcre.h is the setting of the PCRE
 # version number. Therefore, we can create the generic version just by copying.
-pcre.h.generic: pcre.h.in configure.ac
+Xpcre.h.generic: pcre.h.in configure.ac
 	rm -f $@
 	cp -p pcre.h $@
 
@@ -3201,7 +3206,7 @@ pcre.h.generic: pcre.h.in configure.ac
 # macros with values, and to #undef all boolean macros such as HAVE_xxx and
 # SUPPORT_xxx. We also get rid of any gcc-specific visibility settings. Make
 # sure that PCRE_EXP_DEFN is unset (in case it has visibility settings).
-config.h.generic: configure.ac
+Xconfig.h.generic: configure.ac
 	rm -rf $@ _generic
 	mkdir _generic
 	cs=$(srcdir)/config.status; test ! -f $$cs || mv -f $$cs $$cs.aside
