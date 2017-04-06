@@ -1,0 +1,10 @@
+From: Kyle J. McKay <mackyle@gmail.com>
+Subject: [PATCH] Update various docs and README files
+
+Move README to README-PCRE and add a new README.txt,
+README-GIT-REGEX and config.mak files.
+
+Also point pcreposix.3 and pcreposix.html at the new
+pcreposix.h header.
+
+Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
