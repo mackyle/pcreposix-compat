@@ -1,0 +1,93 @@
+Using "pcreposix" With Git
+==========================
+
+Having another tl;dr moment?  Skip to the "Making Git Use pcreposix"
+section at the end.
+
+When building Git, if the `NO_REGEX` option has been set (to anything)
+the bundled "GNU C Library" regex files will be built and included in
+the build.
+
+Even if you did not set `NO_REGEX` explicitly, it's set automatically
+for many platforms and forced on always for `Darwin` platforms (even if
+you set it to empty in a `config.mak` file) so you may have the bundled
+regex implementation in your Git build and not even realize it.
+
+A Git using the bundled glibc regex implementation suffers from perniciously
+pathological performance problems peculiar to glibc's regex implementation.
+
+See the `README.txt` file for an example of a regex that causes problems
+when using the bundled glibc regex implementation.
+
+
+You're Using It And Maybe You Don't Even Know
+---------------------------------------------
+
+You may have tried to use an alternative regex implementation only to have
+the Git build complain and tell you to set `NO_REGEX`.  Since Git v2.10.1
+Git requires support for the BSD extension `REG_STARTEND` option when
+calling the `regexec` function.
+
+The bundled glibc regex provides this (poorly though, the only part of the
+`REG_STARTEND` emulation that works properly compared to the BSD original
+happens to be the single part that Git needs to work).
+
+You may think you're unaffected because your platform's regex works fine
+and provides `REG_STARTEND`.  But if you happen to be running an older
+Darwin system with a perfectly fine regex, since Git v1.8.3.3 you've also
+been silently forced onto the bundled glibc even if you have explicitly
+set `NO_REGEX=` in your own `config.mak` file.
+
+Git's `config.mak.uname` file automatically sets `NO_REGEX` for many
+systems, some of which are quite popular.  So there's a fair chance you're
+using the bundled version anyway and even if you're not, if your system
+uses glibc you're ending up with just a newer version of the same code.
+
+
+Git Accepted Alternative
+------------------------
+
+Git needs BREs (Basic Regular Expressions) and EREs (Extended Regular
+Expressions) to work and the POSIX-specified `REG_NEWLINE` option must work
+as required by POSIX and finally `REG_STARTEND` must work at least enough
+to prevent reading any bytes past the "end" of the `REG_STARTEND` setting.
+
+The combination of the fully POSIX-compliant `REG_NEWLINE` behavior (when
+it's set, something like "[^a]" does NOT match a newline) together with
+the `REG_STARTEND` requirement seems to have knocked out an awful lot of
+alternative regex implementations.
+
+But never fear, the bundled version is here.
+
+See the `README.txt` file.  You don't want the regex implementation bundled
+with Git.  Too bad there's no `NO_REGEX = AnythingButGlibc` option.
+
+
+Making Git Use pcreposix
+------------------------
+
+Are you still having a tl;dr moment?  Then go grab the `config.mak` file in
+this repository now and read it and use it.
+
+The unmodified "pcreposix" library does not work with Git.
+
+The new "pcreposix" library provided by the enhancements in this repository
+does.
+
+It should be as simple as setting `NO_REGEX=` in your own custom `config.mak`
+and then adding `-I $includedir/pcreposix` and `-L $libdir -l pcreposix -l pcre`
+in the right places.
+
+And that will work for all platforms except `Darwin`.  Because the setting
+of `NO_REGEX = YesPlease` is incorrectly done in the `Makefile` rather than
+the `config.mak.uname` file for the `Darwin` platform only, additional
+contortions are required to get a Git build on `Darwin` to use the new
+"pcreposix" library in place of the bundled regex library.
+
+Add the contents of the contents of the `config.mak` file in this repository
+to the end of your own (creating it if you don't have one already) in the
+top-level of the Git distribution you wish to build.
+
+Adjust the `PCREPOSIXDIR` and optionally `PCREPOSIXINC` and/or `PCREPOSIXLIB`
+settings as required to reflect the location of new pcreposix and pcre
+libraries built to include the "pcreposix-compat" enhancements.
