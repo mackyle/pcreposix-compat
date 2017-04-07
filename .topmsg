@@ -1,0 +1,11 @@
+From: Kyle J. McKay <mackyle@gmail.com>
+Subject: [PATCH] improve pcreposix REG_EXTENDED POSIX emulation
+
+For the most part, the extensions that PCRE/Perl have added fall
+under "undefined behavior" so there's no need to disable them when
+doing POSIX emulation.  However, there are the odd few that need
+to get escaped (such as backslash within a character class).
+
+Add a new PCRE_POSIX_EXTENDED option to activate escaping for those.
+
+Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
