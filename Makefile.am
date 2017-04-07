@@ -12,7 +12,10 @@ dist_doc_DATA = \
   ChangeLog \
   LICENCE \
   NEWS \
-  README
+  README.txt \
+  README-PCRE \
+  README-GIT-REGEX \
+  config.mak
 
 # Note that pcrecpp.html is not in this list; it is listed separately below.
 
