@@ -91,3 +91,10 @@ top-level of the Git distribution you wish to build.
 Adjust the `PCREPOSIXDIR` and optionally `PCREPOSIXINC` and/or `PCREPOSIXLIB`
 settings as required to reflect the location of new pcreposix and pcre
 libraries built to include the "pcreposix-compat" enhancements.
+
+Please note that prior to Git v2.11.1, the t7810 test relied on some undefined
+behavior when testing a few of the grep patterns.  This was corrected in Git
+version v2.11.1.  Using the pcreposix-compat library as a regex.h substitute
+in Git versions prior to v2.11.1 will result in a few spurious test failures
+from the t7810 test which can safely be ignored.  There are no t7810 failures
+when using the pcreposix-compat library if you build with Git v2.11.1 or later.
