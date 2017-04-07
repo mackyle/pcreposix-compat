@@ -93,8 +93,10 @@ settings as required to reflect the location of new pcreposix and pcre
 libraries built to include the "pcreposix-compat" enhancements.
 
 Please note that prior to Git v2.11.1, the t7810 test relied on some undefined
-behavior when testing a few of the grep patterns.  This was corrected in Git
-version v2.11.1.  Using the pcreposix-compat library as a regex.h substitute
-in Git versions prior to v2.11.1 will result in a few spurious test failures
-from the t7810 test which can safely be ignored.  There are no t7810 failures
-when using the pcreposix-compat library if you build with Git v2.11.1 or later.
+behavior when testing a few of the grep patterns.  Most of this was corrected
+in Git version v2.11.1, but a few remain that can result in spurious test
+failures.  There is a patch in the `gitpatches` subdirectory that can be
+applied to v2.11.1 to eliminate the spurious failure when using the
+pcreposix-compat library as a regex.h substitute.  Git versions prior to
+v2.11.1 will experience more spurious test failures from the t7810-grep test
+which can also safely be ignored.

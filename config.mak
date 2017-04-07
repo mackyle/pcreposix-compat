@@ -11,10 +11,12 @@
 ##       file does not build them.
 
 ## IMPORTANT:  Prior to Git v2.11.1, using pcreposix-compat as a regex.h
-##             substitute would result in a few spurious t7810 test failures.
-##             This was corrected in Git v2.11.1 and those failures can safely
-##             be ignored when building a version of Git prior to v2.11.1 using
-##             the pcreposix-compat library as a regex.h sustitute.
+##             substitute would result in several spurious t7810 test failures.
+##             This was mostly corrected in Git v2.11.1 and these failures can
+##             safely be ignored.  If building Git v2.11.1 there is a patch in
+##             the `gitpatches` subdirectory that will eliminate the last of
+##             the spurious t7810-grep test failures when using the
+##             pcreposix-compat library as a regex.h sustitute.
 
 # If you already have your own config.mak, add these contents to the END
 # of yours, not the beginning.  The "config.mak" file needs to be placed
