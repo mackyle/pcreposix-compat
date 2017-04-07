@@ -10,6 +10,12 @@ PCRE 8.40 release tarball to provide the "pcreposix-compat" version that
 can build the "pcreposix" headers and libraries that provide full POSIX
 BRE and ERE support as well as PCRE and JRE support.
 
+Note that Git relies on "undefined behavior" in its t7810-grep test.  Most
+of that was corrected in version v2.11.1, but a few remain that can result
+in spurious test failures.  There is a patch in the `gitpatches` subdirectory
+that can be applied to v2.11.1 to eliminate the spurious failure when using
+pcreposix-compat as a regex.h replacement.
+
 
 PCRE Source Tarball
 -------------------
