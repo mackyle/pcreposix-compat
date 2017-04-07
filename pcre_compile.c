@@ -4496,6 +4496,7 @@ pcre_uchar *orig_code = code;
 pcre_uchar *tempcode;
 BOOL inescq = (cd->extended_options & PCRE_VERBATIM_BIT) != 0;
 BOOL basicre = (cd->extended_options & PCRE_POSIX_BASIC_ESC_BIT) != 0;
+BOOL posixre = (cd->extended_options & PCRE_POSIX_RE_BITS) != 0;
 BOOL embednul = (cd->extended_options & PCRE_ALLOW_EMBEDDED_NUL_BIT) != 0;
 BOOL groupsetfirstchar = FALSE;
 const pcre_uchar *ptr = *ptrptr;
@@ -4948,7 +4949,7 @@ for (;; ptr++)
     for (;;)
       {
       c = *(++ptr);
-      if (c == CHAR_BACKSLASH && (!basicre || nestptr))
+      if (c == CHAR_BACKSLASH && (!posixre || nestptr))
         {
         if (ptr[1] == CHAR_E)
           ptr++;
@@ -5251,7 +5252,7 @@ for (;; ptr++)
       as literal characters (by default), or are faulted if
       PCRE_EXTRA is set. */
 
-      if (c == CHAR_BACKSLASH && (!basicre || nestptr))
+      if (c == CHAR_BACKSLASH && (!posixre || nestptr))
         {
         escape = check_escape(&ptr, &ec, errorcodeptr, cd->bracount, options,
           TRUE);
@@ -5402,7 +5403,7 @@ for (;; ptr++)
       code for handling \Q and \E is messy. */
 
       CHECK_RANGE:
-      while (ptr[1] == CHAR_BACKSLASH && ptr[2] == CHAR_E && (!basicre || nestptr))
+      while (ptr[1] == CHAR_BACKSLASH && ptr[2] == CHAR_E && (!posixre || nestptr))
         {
         inescq = FALSE;
         ptr += 2;
@@ -5419,12 +5420,12 @@ for (;; ptr++)
         {
         pcre_uint32 d;
         ptr += 2;
-        while (*ptr == CHAR_BACKSLASH && ptr[1] == CHAR_E && (!basicre || nestptr)) ptr += 2;
+        while (*ptr == CHAR_BACKSLASH && ptr[1] == CHAR_E && (!posixre || nestptr)) ptr += 2;
 
         /* If we hit \Q (not followed by \E) at this point, go into escaped
         mode. */
 
-        while (*ptr == CHAR_BACKSLASH && ptr[1] == CHAR_Q && (!basicre || nestptr))
+        while (*ptr == CHAR_BACKSLASH && ptr[1] == CHAR_Q && (!posixre || nestptr))
           {
           ptr += 2;
           if (*ptr == CHAR_BACKSLASH && ptr[1] == CHAR_E)
@@ -5461,7 +5462,7 @@ for (;; ptr++)
 
         if (!inescq)
           {
-          if (d == CHAR_BACKSLASH && (!basicre || nestptr))
+          if (d == CHAR_BACKSLASH && (!posixre || nestptr))
             {
             int descape;
             descape = check_escape(&ptr, &d, errorcodeptr, cd->bracount, options, TRUE);

@@ -345,6 +345,7 @@ else if (pattern == NULL) return REG_INVARG;
 CHECK_OPTS:
 #define USE_EXTENDED (REG_EXTENDED|REG_PCRE|REG_JAVASCPT)
 if ((cflags & USE_EXTENDED) == 0) options |= PCRE_POSIX_BASIC_ESC;
+if ((cflags & USE_EXTENDED) == REG_EXTENDED) options |= PCRE_POSIX_EXTENDED;
 
 if ((cflags & REG_PEND) != 0)     options |= PCRE_ALLOW_EMBEDDED_NUL;
 
