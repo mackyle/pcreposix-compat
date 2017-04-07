@@ -100,11 +100,16 @@ then the following behavior occurs:
 (The notation "!REG_EXTENDED" below means the "REG_EXTENDED" flag was NOT
  included in the cflags argument and similarly for other "!REG_..." notation.)
 
-  a) Setting REG_PCRE implies REG_EXTENDED which means that
-     PCRE_POSIC_BASIC_ESC will no longer be set for !REG_EXTENDED.
-     Do not try and use Basic Regular Expressions (BREs) with REG_PCRE!
+  a) All PCRE regular expression extensions are allowed.  Most of them are
+     allowed in plain REG_EXTENDED mode, but only the ones that would fall into
+     the "undefined behavior" area of a POSIX regular expression.  Setting the
+     REG_PCRE option allows all possible PCRE regular expressions.
 
-  b) Setting REG_PCRE makes REG_NEWLINE strictly an alias for REG_MULTILINE.
+  b) Setting REG_PCRE implies REG_EXTENDED but with PCRE extensions which
+     means that PCRE_POSIC_BASIC_ESC will no longer be set for !REG_EXTENDED.
+     Do not try and use Basic Regular Expressions (BREs) with REG_PCRE!  Duh.
+
+  c) Setting REG_PCRE makes REG_NEWLINE strictly an alias for REG_MULTILINE.
      In other words all of the extra "macro" logic to activate the various
      "POSIX" semantics PCRE options for !REG_NEWLINE and REG_NEWLINE is
      disabled.  This means that !REG_NEWLINE will no longer force both
