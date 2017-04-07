@@ -733,7 +733,8 @@ am__DIST_COMMON = $(dist_man_MANS) $(srcdir)/Makefile.in \
 	$(srcdir)/libpcrecpp.pc.in $(srcdir)/libpcreposix.pc.in \
 	$(srcdir)/pcre-config.in $(srcdir)/pcre.h.in \
 	$(srcdir)/pcre_stringpiece.h.in $(srcdir)/pcrecpparg.h.in \
-	AUTHORS COPYING ChangeLog INSTALL NEWS README ar-lib compile \
+	AUTHORS COPYING ChangeLog INSTALL NEWS README.txt README-PCRE \
+	README-GIT-REGEX config.mak ar-lib compile \
 	config.guess config.sub depcomp install-sh ltmain.sh missing \
 	test-driver
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -930,7 +931,10 @@ dist_doc_DATA = \
   ChangeLog \
   LICENCE \
   NEWS \
-  README
+  README.txt \
+  README-PCRE \
+  README-GIT-REGEX \
+  config.mak
 
 
 # Note that pcrecpp.html is not in this list; it is listed separately below.
