@@ -331,6 +331,7 @@ else if (pattern == NULL) return REG_INVARG;
 
 CHECK_OPTS:
 if ((cflags & REG_EXTENDED) == 0) options |= PCRE_POSIX_BASIC_ESC;
+if ((cflags & REG_EXTENDED) != 0) options |= PCRE_POSIX_EXTENDED;
 
 if ((cflags & REG_PEND) != 0)     options |= PCRE_ALLOW_EMBEDDED_NUL;
 
