@@ -70,4 +70,4 @@ NO_REGEX =
 
 # Add pcreposix-compat compiler and linker options
 BASIC_CFLAGS += -I$(PCREPOSIXINC)
-BASIC_LDFLAGS += -L$(PCREPOSIXLIB) -lpcreposix -lpcre
+EXTLIBS += -L$(PCREPOSIXLIB) -lpcreposix -lpcre
