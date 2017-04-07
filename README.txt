@@ -392,8 +392,9 @@ the one case (`[^foo]` does not match `\n` when one of the new options is
 enabled).  But again, more slight of hand (an extra `\n` is virtually inserted
 into the negated character class to get the desired semantics).
 
-There are four new PCRE options in all.  (The other two also perform more
-slight-of-hand to provide BSD `REG_PEND` and `REG_NOSPEC` compatibility.)
+There are five new PCRE options in all.  (The other three also perform more
+slight-of-hand to provide POSIX `REG_EXTENDED`, BSD `REG_PEND` and BSD
+`REG_NOSPEC` compatibility.)
 
 The bottom line is that saving off a compiled PCRE regular expression that used
 one (or more) of the new options, loading it on a system without support for
