@@ -151,7 +151,7 @@ index 77890f36..78ed0729 100644
  .
  .SH "MATCHING A PATTERN"
 diff --git a/pcre.h.generic b/pcre.h.generic
-index 206f314b..2b32445b 100644
+index 442c6bdb..dd3f0157 100644
 --- a/pcre.h.generic
 +++ b/pcre.h.generic
 @@ -169,6 +169,7 @@ with J. */
@@ -175,7 +175,7 @@ index 667a45ed..04450558 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre_compile.c b/pcre_compile.c
-index 5976985a..4b69fced 100644
+index c95b7c61..8f93de2b 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -279,6 +279,12 @@ static const pcre_uchar sub_end_of_word[] = {
@@ -220,7 +220,7 @@ index 5976985a..4b69fced 100644
      means that an initial ] is taken as a data character. At the start of the
      loop, c contains the first byte of the character. */
 diff --git a/pcre_internal.h b/pcre_internal.h
-index adb94067..6054867c 100644
+index c04f2ff6..a6c8bc04 100644
 --- a/pcre_internal.h
 +++ b/pcre_internal.h
 @@ -1124,8 +1124,10 @@ bits are present -- at least one reused non-public API bit must also be set. */
@@ -236,7 +236,7 @@ index adb94067..6054867c 100644
  #if (PUBLIC_COMPILE_OPTIONS & PUBLIC_EXTENDED_COMPILE_OPTIONS) != 0
  #error PUBLIC_EXTENDED_COMPILE_OPTIONS conflicts with PUBLIC_COMPILE_OPTIONS
 diff --git a/pcreposix.c b/pcreposix.c
-index cf75588c..026f525b 100644
+index 7b404a71..7361ae0b 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -275,13 +275,17 @@ int options = 0;
@@ -422,4 +422,4 @@ index 020f51e3..b9a8fde6 100644
  /a\Cb/
 
 -- 
-tg: (0272abc4..) t/posix-reg-newline (depends on: t/pcre-extended-options)
+tg: (de76990d..) t/posix-reg-newline (depends on: t/pcre-extended-options)

@@ -19,7 +19,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  5 files changed, 16 insertions(+), 7 deletions(-)
 
 diff --git a/pcre.h.generic b/pcre.h.generic
-index cf8242d1..906ca3d3 100644
+index 6041716f..b88d5c41 100644
 --- a/pcre.h.generic
 +++ b/pcre.h.generic
 @@ -173,6 +173,7 @@ with J. */
@@ -43,7 +43,7 @@ index 07e43a1b..8d1bb7bb 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre_compile.c b/pcre_compile.c
-index f04efe48..345c89ee 100644
+index 59f1166f..ea409e71 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -4496,6 +4496,7 @@ pcre_uchar *orig_code = code;
@@ -106,7 +106,7 @@ index f04efe48..345c89ee 100644
              int descape;
              descape = check_escape(&ptr, &d, errorcodeptr, cd->bracount, options, TRUE);
 diff --git a/pcre_internal.h b/pcre_internal.h
-index 48966eda..b4c659d6 100644
+index ce53995b..11b4aed2 100644
 --- a/pcre_internal.h
 +++ b/pcre_internal.h
 @@ -1132,10 +1132,15 @@ bits are present -- at least one reused non-public API bit must also be set. */
@@ -127,7 +127,7 @@ index 48966eda..b4c659d6 100644
  #if (PUBLIC_COMPILE_OPTIONS & PUBLIC_EXTENDED_COMPILE_OPTIONS) != 0
  #error PUBLIC_EXTENDED_COMPILE_OPTIONS conflicts with PUBLIC_COMPILE_OPTIONS
 diff --git a/pcreposix.c b/pcreposix.c
-index 96336820..6d3878c2 100644
+index 0350dd44..3cd9f401 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -331,6 +331,7 @@ else if (pattern == NULL) return REG_INVARG;
@@ -140,4 +140,4 @@ index 96336820..6d3878c2 100644
  
 
 -- 
-tg: (0ec326aa..) t/posix-reg-extended (depends on: t/compat-reg-pend)
+tg: (d2ff070b..) t/posix-reg-extended (depends on: t/compat-reg-pend)

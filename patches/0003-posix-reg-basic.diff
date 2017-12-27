@@ -52,17 +52,17 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
 ---
  pcre.h.generic        |  1 +
  pcre.h.in             |  1 +
- pcre_compile.c        | 73 +++++++++++++++++++++++++++++++++++++--------------
+ pcre_compile.c        | 75 ++++++++++++++++++++++++++++++++++++---------------
  pcre_internal.h       |  3 ++-
  pcreposix.c           |  2 ++
  pcreposix.h           |  6 ++---
  pcretest.c            |  4 +--
  testdata/testinput14  | 18 +++++++++++++
  testdata/testoutput14 | 29 ++++++++++++++++++++
- 9 files changed, 110 insertions(+), 27 deletions(-)
+ 9 files changed, 111 insertions(+), 28 deletions(-)
 
 diff --git a/pcre.h.generic b/pcre.h.generic
-index 2b32445b..e54eb5f2 100644
+index dd3f0157..4318f9a5 100644
 --- a/pcre.h.generic
 +++ b/pcre.h.generic
 @@ -170,6 +170,7 @@ with J. */
@@ -86,7 +86,7 @@ index 04450558..fc54c00c 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre_compile.c b/pcre_compile.c
-index 4b69fced..2c6e9693 100644
+index 8f93de2b..1edad750 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -964,21 +964,26 @@ Returns:    TRUE or FALSE
@@ -264,7 +264,16 @@ index 4b69fced..2c6e9693 100644
              {
              int descape;
              descape = check_escape(&ptr, &d, errorcodeptr, cd->bracount, options, TRUE);
-@@ -5772,13 +5804,13 @@ for (;; ptr++)
+@@ -5770,7 +5802,7 @@ for (;; ptr++)
+     extended mode. */
+ 
+     if (ptr[1] == CHAR_LEFT_PARENTHESIS && ptr[2] == CHAR_QUESTION_MARK &&
+-        ptr[3] == CHAR_NUMBER_SIGN)
++        ptr[3] == CHAR_NUMBER_SIGN && (!basicre || nestptr))
+       {
+       ptr += 4;
+       while (*ptr != CHAR_NULL && *ptr != CHAR_RIGHT_PARENTHESIS) ptr++;
+@@ -5787,13 +5819,13 @@ for (;; ptr++)
      but if PCRE_UNGREEDY is set, it works the other way round. We change the
      repeat type to the non-default. */
  
@@ -280,7 +289,7 @@ index 4b69fced..2c6e9693 100644
        {
        repeat_type = greedy_non_default;
        ptr++;
-@@ -6625,7 +6657,7 @@ for (;; ptr++)
+@@ -6640,7 +6672,7 @@ for (;; ptr++)
  
      /* Now deal with various "verbs" that can be introduced by '*'. */
  
@@ -289,7 +298,7 @@ index 4b69fced..2c6e9693 100644
           || (MAX_255(ptr[1]) && ((cd->ctypes[ptr[1]] & ctype_letter) != 0))))
        {
        int i, namelen;
-@@ -6777,7 +6809,7 @@ for (;; ptr++)
+@@ -6792,7 +6824,7 @@ for (;; ptr++)
      /* Deal with the extended parentheses; all are introduced by '?', and the
      appearance of any of them means that this is not a capturing group. */
  
@@ -298,7 +307,7 @@ index 4b69fced..2c6e9693 100644
        {
        int i, set, unset, namelen;
        int *optset;
-@@ -7089,7 +7121,7 @@ for (;; ptr++)
+@@ -7104,7 +7136,7 @@ for (;; ptr++)
          ptr++;
          if (*ptr == CHAR_RIGHT_PARENTHESIS && ptr[1] != CHAR_ASTERISK &&
               ptr[1] != CHAR_PLUS && ptr[1] != CHAR_QUESTION_MARK &&
@@ -307,7 +316,7 @@ index 4b69fced..2c6e9693 100644
            {
            *code++ = OP_FAIL;
            previous = NULL;
-@@ -9164,7 +9196,8 @@ the offset for later. */
+@@ -9178,7 +9210,8 @@ the offset for later. */
  cd->external_flags = 0;   /* Initialize here for LIMIT_MATCH/RECURSION */
  
  while (ptr[skipatstart] == CHAR_LEFT_PARENTHESIS &&
@@ -318,7 +327,7 @@ index 4b69fced..2c6e9693 100644
    int newnl = 0;
    int newbsr = 0;
 diff --git a/pcre_internal.h b/pcre_internal.h
-index 6054867c..9a40f046 100644
+index a6c8bc04..fc4b1b9a 100644
 --- a/pcre_internal.h
 +++ b/pcre_internal.h
 @@ -1125,9 +1125,10 @@ bits are present -- at least one reused non-public API bit must also be set. */
@@ -334,7 +343,7 @@ index 6054867c..9a40f046 100644
  #if (PUBLIC_COMPILE_OPTIONS & PUBLIC_EXTENDED_COMPILE_OPTIONS) != 0
  #error PUBLIC_EXTENDED_COMPILE_OPTIONS conflicts with PUBLIC_COMPILE_OPTIONS
 diff --git a/pcreposix.c b/pcreposix.c
-index 026f525b..4d576d09 100644
+index 7361ae0b..e8c4748e 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -274,6 +274,8 @@ int errorcode;
@@ -364,7 +373,7 @@ index e2cc94b8..44911231 100644
  /* Error values. Not all these are relevant or used by the wrapper. */
  
 diff --git a/pcretest.c b/pcretest.c
-index 5b73a918..090c6de7 100644
+index f1303037..b2d5af4b 100644
 --- a/pcretest.c
 +++ b/pcretest.c
 @@ -3793,7 +3793,7 @@ while (!done)
@@ -456,4 +465,4 @@ index b9a8fde6..5b7f6067 100644
  /a\Cb/
 
 -- 
-tg: (c8be0c0d..) t/posix-reg-basic (depends on: t/posix-reg-newline)
+tg: (f4a6dd29..) t/posix-reg-basic (depends on: t/posix-reg-newline)

@@ -26,7 +26,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  7 files changed, 118 insertions(+), 38 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 42451ad8..9e66f60e 100644
+index 858a34bd..213d5393 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -451,6 +451,10 @@ ELSE(PCRE_REBUILD_CHARTABLES)
@@ -345,27 +345,27 @@ index 9c8ccecb..ff33ac09 100644
  @WITH_REBUILD_CHARTABLES_TRUE@	./dftables$(EXEEXT) $@
  
 diff --git a/configure b/configure
-index 42b9638d..f1712d2c 100755
+index 6fe8854a..82053283 100755
 --- a/configure
 +++ b/configure
 @@ -19667,7 +19667,7 @@ EXTRA_LIBPCRE32_LDFLAGS="$EXTRA_LIBPCRE32_LDFLAGS \
-                        $NO_UNDEFINED -version-info 0:8:0"
+                        $NO_UNDEFINED -version-info 0:9:0"
  
  EXTRA_LIBPCREPOSIX_LDFLAGS="$EXTRA_LIBPCREPOSIX_LDFLAGS \
--                            $NO_UNDEFINED -version-info 0:4:0"
+-                            $NO_UNDEFINED -version-info 0:5:0"
 +                            $NO_UNDEFINED -version-info 1:0:0"
  
  EXTRA_LIBPCRECPP_LDFLAGS="$EXTRA_LIBPCRECPP_LDFLAGS \
                            $NO_UNDEFINED -version-info 0:1:0 \
 diff --git a/configure.ac b/configure.ac
-index 24ef7271..525373a7 100644
+index 718a1850..42176fa3 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -20,7 +20,7 @@ m4_define(pcre_date, [2017-01-11])
- m4_define(libpcre_version, [3:8:2])
- m4_define(libpcre16_version, [2:8:2])
- m4_define(libpcre32_version, [0:8:0])
--m4_define(libpcreposix_version, [0:4:0])
+@@ -20,7 +20,7 @@ m4_define(pcre_date, [2017-07-05])
+ m4_define(libpcre_version, [3:9:2])
+ m4_define(libpcre16_version, [2:9:2])
+ m4_define(libpcre32_version, [0:9:0])
+-m4_define(libpcreposix_version, [0:5:0])
 +m4_define(libpcreposix_version, [1:0:0])
  m4_define(libpcrecpp_version, [0:1:0])
  
@@ -398,4 +398,4 @@ index 78ed0729..a19235e9 100644
  .B int regcomp(regex_t *\fIpreg\fP, const char *\fIpattern\fP,
 
 -- 
-tg: (bb30a759..) t/compat-version (depends on: t/compat-reg-startend)
+tg: (c9f10093..) t/compat-version (depends on: t/compat-reg-startend)

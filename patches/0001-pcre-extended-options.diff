@@ -49,10 +49,10 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  2 files changed, 25 insertions(+), 1 deletion(-)
 
 diff --git a/pcre_compile.c b/pcre_compile.c
-index de92313e..5976985a 100644
+index 42f204cd..c95b7c61 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
-@@ -9049,6 +9049,7 @@ pcre_uint32 firstchar, reqchar;
+@@ -9063,6 +9063,7 @@ pcre_uint32 firstchar, reqchar;
  pcre_uint32 limit_match = PCRE_UINT32_MAX;
  pcre_uint32 limit_recursion = PCRE_UINT32_MAX;
  int newline;
@@ -60,7 +60,7 @@ index de92313e..5976985a 100644
  int errorcode = 0;
  int skipatstart = 0;
  BOOL utf;
-@@ -9111,12 +9112,21 @@ cd->ctypes = tables + ctypes_offset;
+@@ -9125,12 +9126,21 @@ cd->ctypes = tables + ctypes_offset;
  
  /* Check that all undefined public option bits are zero */
  
@@ -83,7 +83,7 @@ index de92313e..5976985a 100644
  /* If PCRE_NEVER_UTF is set, remember it. */
  
  if ((options & PCRE_NEVER_UTF) != 0) never_utf = TRUE;
-@@ -9355,6 +9365,7 @@ cd->parens_depth = 0;
+@@ -9369,6 +9379,7 @@ cd->parens_depth = 0;
  cd->assert_depth = 0;
  cd->max_lookbehind = 0;
  cd->external_options = options;
@@ -92,7 +92,7 @@ index de92313e..5976985a 100644
  
  /* Now do the pre-compile. On error, errorcode will be set non-zero, so we
 diff --git a/pcre_internal.h b/pcre_internal.h
-index 2923b29f..adb94067 100644
+index 97ff55d0..c04f2ff6 100644
 --- a/pcre_internal.h
 +++ b/pcre_internal.h
 @@ -1119,6 +1119,18 @@ time, run time, or study time, respectively. */
@@ -124,4 +124,4 @@ index 2923b29f..adb94067 100644
    BOOL had_accept;                  /* (*ACCEPT) encountered */
 
 -- 
-tg: (84bd6c4d..) t/pcre-extended-options (depends on: t/vendor)
+tg: (bd65c17e..) t/pcre-extended-options (depends on: t/vendor)

@@ -2217,7 +2217,7 @@ index 00000000..c3ca0746
 \ No newline at end of file
 diff --git a/README.txt b/README.txt
 new file mode 100644
-index 00000000..93461f73
+index 00000000..8c53892a
 --- /dev/null
 +++ b/README.txt
 @@ -0,0 +1,489 @@
@@ -2673,9 +2673,9 @@ index 00000000..93461f73
 +and then "make install").
 +
 +This repository already contains the necessary pre-generated "configure" and
-+patches pre-applied to the PCRE 8.40 tarball release.  Clone it, download a
++patches pre-applied to the PCRE 8.41 tarball release.  Clone it, download a
 +tarball of it or see the "pcreposix-compat-patches" branch for individual
-+patches to apply to a PCRE 8.40 tarball yourself.
++patches to apply to a PCRE 8.41 tarball yourself.
 +
 +Clients that explicitly need to use non-POSIX options should include the header
 +as `#include <pcreposix/pcreposix.h>` and make sure they set the `REG_PCRE`
@@ -2866,4 +2866,4 @@ index 00000000..bdb9297f
 +---
 
 -- 
-tg: (c00112bc..) t/compat-readme (depends on: t/compat-version)
+tg: (076e1bd7..) t/compat-readme (depends on: t/compat-version)
