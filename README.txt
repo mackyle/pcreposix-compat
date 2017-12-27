@@ -450,9 +450,9 @@ Build and install like normal for PCRE (e.g. run "./configure" then "make"
 and then "make install").
 
 This repository already contains the necessary pre-generated "configure" and
-patches pre-applied to the PCRE 8.40 tarball release.  Clone it, download a
+patches pre-applied to the PCRE 8.41 tarball release.  Clone it, download a
 tarball of it or see the "pcreposix-compat-patches" branch for individual
-patches to apply to a PCRE 8.40 tarball yourself.
+patches to apply to a PCRE 8.41 tarball yourself.
 
 Clients that explicitly need to use non-POSIX options should include the header
 as `#include <pcreposix/pcreposix.h>` and make sure they set the `REG_PCRE`
