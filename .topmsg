@@ -15,8 +15,17 @@ an ending offset of 4 it should match and the match result should
 have a starting offset of 3 and an ending offset of 4 NOT a starting
 offset of 1 and an ending offset of 2.
 
+This was corrected in pcre-8.41 after a bug report was filed about
+it, but the fix failed to consider the possibility that either
+rm_so or rm_eo could be less than zero.  If that ever happens
+(as an error indication that the group in question did not match),
+then the error indication would be corrupted by adding a non-zero
+starting offset.
+
 Fix this so that it works properly by adding the starting offset
-back to any successful matches as they're returned.
+back only to any successful matches (i.e. rm_so and rm_eo are both
+greather than or equal to zero) as they're returned, but be sure
+to leave unsuccessful match results alone.
 
 Note: This patch is licensed under the same terms as PCRE itself.
 
