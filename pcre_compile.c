@@ -5802,7 +5802,7 @@ for (;; ptr++)
     extended mode. */
 
     if (ptr[1] == CHAR_LEFT_PARENTHESIS && ptr[2] == CHAR_QUESTION_MARK &&
-        ptr[3] == CHAR_NUMBER_SIGN)
+        ptr[3] == CHAR_NUMBER_SIGN && (!basicre || nestptr))
       {
       ptr += 4;
       while (*ptr != CHAR_NULL && *ptr != CHAR_RIGHT_PARENTHESIS) ptr++;
