@@ -1,0 +1,12 @@
+From: Kyle J. McKay <mackyle@gmail.com>
+Subject: [PATCH] pcre_jit_compile.c: add jit stubs when !SUPPORT_JIT
+
+When SUPPORT_JIT is NOT defined provide stubs as appropriate that
+redirect pcre_jit_exec, pcre16_jit_exec and pcre32_jit_exec to
+their non-jit counterparts.
+
+This allows clients built against the pcre_jit_exec API to work
+seemlessly (by falling back to non-JIT) with a non-JIT capable
+version of the library.
+
+Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
