@@ -11716,20 +11716,25 @@ sljit_free_unused_memory_exec();
 /* These are dummy functions to avoid linking errors when JIT support is not
 being compiled. */
 
+static const void *const dummy_stack = NULL;
+
 #if defined COMPILE_PCRE8
+#define DUMMY_STACK (pcre_jit_stack *)&dummy_stack
 PCRE_EXP_DECL pcre_jit_stack *
 pcre_jit_stack_alloc(int startsize, int maxsize)
 #elif defined COMPILE_PCRE16
+#define DUMMY_STACK (pcre16_jit_stack *)&dummy_stack
 PCRE_EXP_DECL pcre16_jit_stack *
 pcre16_jit_stack_alloc(int startsize, int maxsize)
 #elif defined COMPILE_PCRE32
+#define DUMMY_STACK (pcre32_jit_stack *)&dummy_stack
 PCRE_EXP_DECL pcre32_jit_stack *
 pcre32_jit_stack_alloc(int startsize, int maxsize)
 #endif
 {
 (void)startsize;
 (void)maxsize;
-return NULL;
+return DUMMY_STACK;
 }
 
 #if defined COMPILE_PCRE8
