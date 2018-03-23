@@ -257,7 +257,8 @@ return length + addlength;
 PCREPOSIX_EXP_DEFN void PCRE_CALL_CONVENTION
 regfree(regex_t *preg)
 {
-(PUBL(free))(preg->re_pcre);
+if (preg->re_impl != NULL)
+  (PUBL(free))(preg->re_impl);
 }
 
 
@@ -290,7 +291,7 @@ const char *vptrs[4];
 char altpattern[(sizeof(void *) * 2) + 1];
 
 if (preg == NULL) return REG_INVARG;
-preg->re_pcre = NULL;
+preg->re_impl = NULL;
 if ((cflags & REGCOMP_OPTIONS) != cflags) return REG_INVARG;
 
 if ((cflags & REG_PEND) != 0)
@@ -370,7 +371,7 @@ if ((cflags & (REG_PCRE|REG_JAVASCPT)) == 0)
   if ((cflags & REG_NEWLINE) != 0)  options |= PCRE_NOT_EXCLUDES_NL;
   }
 
-preg->re_pcre = pcre_compile2(pattern, options, &errorcode, &errorptr,
+preg->re_impl = pcre_compile2(pattern, options, &errorcode, &errorptr,
   &erroffset, NULL);
 preg->re_erroffset = erroffset;
 if (dupez) free(dupez);
@@ -378,13 +379,13 @@ if (dupez) free(dupez);
 /* Safety: if the error code is too big for the translation vector (which
 should not happen, but we all make mistakes), return REG_BADPAT. */
 
-if (preg->re_pcre == NULL)
+if (preg->re_impl == NULL)
   {
   return (errorcode < (int)(sizeof(eint)/sizeof(const int)))?
     eint[errorcode] : REG_BADPAT;
   }
 
-(void)pcre_fullinfo((const pcre *)preg->re_pcre, NULL, PCRE_INFO_CAPTURECOUNT,
+(void)pcre_fullinfo((const pcre *)preg->re_impl, NULL, PCRE_INFO_CAPTURECOUNT,
   &re_nsub);
 preg->re_nsub = (size_t)re_nsub;
 return 0;
@@ -424,7 +425,7 @@ if (preg == NULL) return REG_INVARG;
 if ((eflags & REGEXEC_OPTIONS) != eflags) return REG_INVARG;
 
 nosub =
-  (REAL_PCRE_OPTIONS((const pcre *)preg->re_pcre) & PCRE_NO_AUTO_CAPTURE) != 0;
+  (REAL_PCRE_OPTIONS((const pcre *)preg->re_impl) & PCRE_NO_AUTO_CAPTURE) != 0;
 
 if ((eflags & REG_NOTBOL) != 0) options |= PCRE_NOTBOL;
 if ((eflags & REG_NOTEOL) != 0) options |= PCRE_NOTEOL;
@@ -475,7 +476,7 @@ else
 
 len = (int)(eo - so);
 if ((size_t)len != (eo - so)) return REG_INVARG;
-rc = pcre_exec((const pcre *)preg->re_pcre, NULL, string + so, len,
+rc = pcre_exec((const pcre *)preg->re_impl, NULL, string + so, len,
   0, options, ovector, (int)(nmatch * 3));
 
 if (rc == 0) rc = (int)nmatch;    /* All captured slots were filled in */
