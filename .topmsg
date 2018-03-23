@@ -1,0 +1,13 @@
+From: Kyle J. McKay <mackyle@gmail.com>
+Subject: [PATCH] make regcomp use JIT if available
+
+If JIT is available, attempt to compile the pattern for JIT
+at regcomp time in pcreposix.c.
+
+If that fails, silently fall back to normal non-JIT operation.
+
+Some patterns will not JIT compile in any case so the fallback
+must always be present.  It's very little extra work to attempt
+to JIT compile the pattern when supported.
+
+Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
