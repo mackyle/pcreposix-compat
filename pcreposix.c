@@ -6,7 +6,7 @@
 and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
-           Copyright (C) 1997-2017 University of Cambridge
+           Copyright (c) 1997-2018 University of Cambridge
            Copyright (C) 2017 Kyle J. McKay <mackyle@gmail.com>
            All Rights Reserved
 
@@ -489,13 +489,8 @@ if (rc >= 0)
     {
     for (i = 0; i < (size_t)rc; i++)
       {
-      pmatch[i].rm_so = (regoff_t)ovector[i*2];
-      pmatch[i].rm_eo = (regoff_t)ovector[i*2+1];
-      if (pmatch[i].rm_so >= 0 && pmatch[i].rm_eo >= 0)
-        {
-        pmatch[i].rm_so += (regoff_t)so;
-        pmatch[i].rm_eo += (regoff_t)so;
-        }
+      pmatch[i].rm_so = (ovector[i*2] < 0)? (regoff_t)-1 : (regoff_t)ovector[i*2] + (regoff_t)so;
+      pmatch[i].rm_eo = (ovector[i*2+1] < 0)? (regoff_t)-1: (regoff_t)ovector[i*2+1] + (regoff_t)so;
       }
     if (allocated_ovector) free(ovector);
     for (; i < nmatch; i++) pmatch[i].rm_so = pmatch[i].rm_eo = -1;
