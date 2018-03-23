@@ -4614,8 +4614,7 @@ for (;; ptr++)
       }
     else if (c == CHAR_BACKSLASH &&
              !((CHAR_1 <= ptr[1] && ptr[1] <= CHAR_9) || ptr[1] == CHAR_DOT ||
-               ptr[1] == CHAR_BACKSLASH || ptr[1] == CHAR_PLUS ||
-               ptr[1] == CHAR_QUESTION_MARK || ptr[1] == CHAR_VERTICAL_LINE ||
+               ptr[1] == CHAR_BACKSLASH ||
                ptr[1] == CHAR_LEFT_SQUARE_BRACKET || ptr[1] == CHAR_ASTERISK ||
                ptr[1] == CHAR_CIRCUMFLEX_ACCENT || ptr[1] == CHAR_DOLLAR_SIGN))
       {
