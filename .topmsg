@@ -8,29 +8,33 @@ for !REG_EXTENDED (aka BREs "Basic Regular Expressions") is missing.
 Unfortunately, this greatly limits its ability to be used as a
 drop-in replacement.
 
-In order to add support for !REG_EXTENDED patterns (aka BREs),
-the following changes are effected:
+In order to add support for !REG_EXTENDED patterns (aka BREs), the
+following changes are effected:
 
 1. A new PCRE_POSIX_BASIC_ESC option is provided.
 
-   This is implemented in the standard PCRE library and is
-   available for any caller to use.  It causes all occurrences
-   of '+', '?' and '|' to always be automatically escaped meaning
-   they always match literally and it causes '(', ')', '{', and '}'
-   to become escaped (i.e. preceded by a backslash '\') if they
-   are not or to ignore a preceding backslash if they are.
-   (Obviously if they are inside a character class their behavior
-   remains unchanged even when using this option.)
+   This is implemented in the standard PCRE library and is available
+   for any caller to use.  It causes all occurrences of '+', '?',
+   '|', '(', ')', '{', and '}' to become escaped (i.e. preceded by
+   a backslash '\') if they are not or to ignore a preceding backslash
+   if they are. (Obviously if they are inside a character class
+   their behavior remains unchanged even when using this option.)
 
-   This has the effect of changing the grouping delimiters from
-   '(' and ')' to '\(' and '\)' and the quantifier delimiters
-   from '{' and '}' to '\{' and '\}' while making any bare
-   '(', ')', '{', or '}' characters match literally.
+   This has the effect of changing the grouping delimiters from '('
+   and ')' to '\(' and '\)' and the quantifier delimiters from '{'
+   and '}' to '\{' and '\}' while making any bare '(', ')', '{',
+   or '}' characters match literally.
 
-   This is how POSIX BREs are specified.  Note that because the
-   '+', '?' and '|' characters are always matched literally
-   with this option (whether preceded by a backslash or not),
-   alternation and minimal matching become inaccessible.
+   This is how POSIX BREs are specified.  Note that POSIX specifies
+   that a backslash preceding an ordinary character is "undefined"
+   in a BRE.  That allows the interpretation of the '+', '?' and
+   '|' characters as their matching operators when they are preceded
+   by a backslash.  The alternative would be to match them literally
+   but that's still "undefined" behavior and at least one other BRE
+   implementation chooses the matching operator implementation.
+
+   Since there's no performance advantage or disadvantage to either
+   interpretation, the more functional interpretation is chosen.
 
 2. The pcreposix wrapper adds the following behavior:
 
@@ -42,8 +46,8 @@ the following changes are effected:
 
 3. A new REG_BASIC define is added with the value 0.
 
-   The BSDish headers define this so it's nice to have
-   for compatibility.
+   The BSDish headers define this so it's nice to have for
+   compatibility.
 
 Note: This patch is licensed under the same terms as PCRE itself.
 
