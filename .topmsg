@@ -22,10 +22,8 @@ rm_so or rm_eo could be less than zero.  If that ever happens
 then the error indication would be corrupted by adding a non-zero
 starting offset.
 
-Fix this so that it works properly by adding the starting offset
-back only to any successful matches (i.e. rm_so and rm_eo are both
-greather than or equal to zero) as they're returned, but be sure
-to leave unsuccessful match results alone.
+The final bug was corrected in pcre-8.42 after another bug report
+was filed about that.  This patch finally is no longer necessary.
 
 Note: This patch is licensed under the same terms as PCRE itself.
 
