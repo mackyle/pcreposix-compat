@@ -200,7 +200,7 @@ No match: POSIX code 17: match failed
 
 /X\?Y\+\|Z/PP
     X?Y+|Z
- 0: X?Y+|Z
+ 0: Y
 
 /X?Y+|Z/PP
     X?Y+|Z
