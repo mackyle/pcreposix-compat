@@ -156,7 +156,7 @@ also apply to REG_JAVASCPT but REG_JAVASCPT also sets PCRE_JAVASCRIPT_COMPAT. */
 /* The structure representing a compiled regular expression. */
 
 typedef struct {
-  void *re_pcre;
+  void *re_impl; /* keep out */
   size_t re_nsub;
   size_t re_erroffset;
   const char *re_endp; /* REG_PEND only */
