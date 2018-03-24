@@ -1,5 +1,5 @@
 From: Kyle J. McKay <mackyle@gmail.com>
-Subject: [PATCH] make regcomp use JIT if available
+Subject: [PATCH] pcreposix: make regcomp use JIT if available
 
 If JIT is available, attempt to compile the pattern for JIT
 at regcomp time in pcreposix.c.
