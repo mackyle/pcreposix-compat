@@ -11714,7 +11714,7 @@ pcre32_jit_exec(const pcre32 *argument_re, const pcre32_extra *extra_data,
 #endif
 {
 pcre_uchar *subject_ptr = (pcre_uchar *)subject;
-executable_functions *functions = (executable_functions *)extra_data->executable_jit;
+executable_functions *functions = (executable_functions *)(extra_data? extra_data->executable_jit : NULL);
 union {
    void *executable_func;
    jit_function call_executable_func;
@@ -11735,7 +11735,15 @@ else if ((options & PCRE_PARTIAL_SOFT) != 0)
   mode = JIT_PARTIAL_SOFT_COMPILE;
 
 if (functions == NULL || functions->executable_funcs[mode] == NULL)
-  return PCRE_ERROR_JIT_BADOPTION;
+  return
+#if defined COMPILE_PCRE8
+    pcre_exec
+#elif defined COMPILE_PCRE16
+    pcre16_exec
+#elif defined COMPILE_PCRE32
+    pcre32_exec
+#endif
+      (argument_re, extra_data, subject, length, start_offset, options, offsets, offset_count);
 
 /* Sanity checks should be handled by pcre_exec. */
 arguments.stack = (struct sljit_stack *)stack;
