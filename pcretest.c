@@ -3018,6 +3018,7 @@ clock_t total_match_time = 0;
 
 #if !defined NOPOSIX
 int posix = 0;
+int cflags = 0;
 #endif
 #if !defined NODFA
 int *dfa_workspace = NULL;
@@ -3930,7 +3931,7 @@ while (!done)
   if (posix || do_posix)
     {
     int rc;
-    int cflags = do_posix < 2 ? REG_EXTENDED : REG_BASIC;
+    cflags = do_posix < 2 ? REG_EXTENDED : REG_BASIC;
 
     if ((options & PCRE_CASELESS) != 0) cflags |= REG_ICASE;
     if ((options & PCRE_MULTILINE) != 0) cflags |= REG_NEWLINE;
@@ -5081,7 +5082,7 @@ while (!done)
         (void)regerror(rc, &preg, (char *)buffer, buffer_size);
         fprintf(outfile, "No match: POSIX code %d: %s\n", rc, buffer);
         }
-      else if ((REAL_PCRE_OPTIONS(preg.re_pcre) & PCRE_NO_AUTO_CAPTURE) != 0)
+      else if ((cflags & REG_NOSUB) != 0)
         {
         fprintf(outfile, "Matched with REG_NOSUB\n");
         }
@@ -5701,7 +5702,7 @@ while (!done)
   CONTINUE:
 
 #if !defined NOPOSIX
-  if ((posix || do_posix) && preg.re_pcre != 0) regfree(&preg);
+  if ((posix || do_posix)) regfree(&preg);
 #endif
 
   if (re != NULL) new_free(re);

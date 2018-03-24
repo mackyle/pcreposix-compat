@@ -46,6 +46,42 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "pcre_internal.h"
 
+#if !defined SUPPORT_JIT
+
+/* Stubs for clients compiled against pcre_jit_exec (and friends)
+so they gracefully fall back to non-JIT. */
+
+#if defined COMPILE_PCRE8
+PCRE_EXP_DEFN int PCRE_CALL_CONVENTION
+pcre_jit_exec(const pcre *argument_re, const pcre_extra *extra_data,
+  PCRE_SPTR subject, int length, int start_offset, int options,
+  int *offsets, int offset_count, pcre_jit_stack *stack)
+#elif defined COMPILE_PCRE16
+PCRE_EXP_DEFN int PCRE_CALL_CONVENTION
+pcre16_jit_exec(const pcre16 *argument_re, const pcre16_extra *extra_data,
+  PCRE_SPTR16 subject, int length, int start_offset, int options,
+  int *offsets, int offset_count, pcre16_jit_stack *stack)
+#elif defined COMPILE_PCRE32
+PCRE_EXP_DEFN int PCRE_CALL_CONVENTION
+pcre32_jit_exec(const pcre32 *argument_re, const pcre32_extra *extra_data,
+  PCRE_SPTR32 subject, int length, int start_offset, int options,
+  int *offsets, int offset_count, pcre32_jit_stack *stack)
+#endif
+{
+(void)stack;
+return
+#if defined COMPILE_PCRE8
+  pcre_exec
+#elif defined COMPILE_PCRE16
+  pcre16_exec
+#elif defined COMPILE_PCRE32
+  pcre32_exec
+#endif
+    (argument_re, extra_data, subject, length, start_offset, options, offsets, offset_count);
+}
+
+#endif /* !SUPPORT_JIT stubs */
+
 #if defined SUPPORT_JIT
 
 /* All-in-one: Since we use the JIT compiler only from here,
@@ -11678,7 +11714,7 @@ pcre32_jit_exec(const pcre32 *argument_re, const pcre32_extra *extra_data,
 #endif
 {
 pcre_uchar *subject_ptr = (pcre_uchar *)subject;
-executable_functions *functions = (executable_functions *)extra_data->executable_jit;
+executable_functions *functions = (executable_functions *)(extra_data? extra_data->executable_jit : NULL);
 union {
    void *executable_func;
    jit_function call_executable_func;
@@ -11699,7 +11735,15 @@ else if ((options & PCRE_PARTIAL_SOFT) != 0)
   mode = JIT_PARTIAL_SOFT_COMPILE;
 
 if (functions == NULL || functions->executable_funcs[mode] == NULL)
-  return PCRE_ERROR_JIT_BADOPTION;
+  return
+#if defined COMPILE_PCRE8
+    pcre_exec
+#elif defined COMPILE_PCRE16
+    pcre16_exec
+#elif defined COMPILE_PCRE32
+    pcre32_exec
+#endif
+      (argument_re, extra_data, subject, length, start_offset, options, offsets, offset_count);
 
 /* Sanity checks should be handled by pcre_exec. */
 arguments.stack = (struct sljit_stack *)stack;
@@ -11849,20 +11893,25 @@ sljit_free_unused_memory_exec();
 /* These are dummy functions to avoid linking errors when JIT support is not
 being compiled. */
 
+static const void *const dummy_stack = NULL;
+
 #if defined COMPILE_PCRE8
+#define DUMMY_STACK (pcre_jit_stack *)&dummy_stack
 PCRE_EXP_DECL pcre_jit_stack *
 pcre_jit_stack_alloc(int startsize, int maxsize)
 #elif defined COMPILE_PCRE16
+#define DUMMY_STACK (pcre16_jit_stack *)&dummy_stack
 PCRE_EXP_DECL pcre16_jit_stack *
 pcre16_jit_stack_alloc(int startsize, int maxsize)
 #elif defined COMPILE_PCRE32
+#define DUMMY_STACK (pcre32_jit_stack *)&dummy_stack
 PCRE_EXP_DECL pcre32_jit_stack *
 pcre32_jit_stack_alloc(int startsize, int maxsize)
 #endif
 {
 (void)startsize;
 (void)maxsize;
-return NULL;
+return DUMMY_STACK;
 }
 
 #if defined COMPILE_PCRE8
