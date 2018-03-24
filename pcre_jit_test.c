@@ -1268,7 +1268,8 @@ static int regression_tests(void)
 				pcre_free(re8);
 				re8 = NULL;
 			}
-			extra8->flags |= PCRE_EXTRA_MARK;
+			else
+				extra8->flags |= PCRE_EXTRA_MARK;
 		} else if (((utf && ucp) || is_ascii) && !(current->start_offset & F_NO8))
 			printf("\n8 bit: Cannot compile pattern \"%s\": %s\n", current->pattern, error);
 #endif
@@ -1299,7 +1300,8 @@ static int regression_tests(void)
 				pcre16_free(re16);
 				re16 = NULL;
 			}
-			extra16->flags |= PCRE_EXTRA_MARK;
+			else
+				extra16->flags |= PCRE_EXTRA_MARK;
 		} else if (((utf && ucp) || is_ascii) && !(current->start_offset & F_NO16))
 			printf("\n16 bit: Cannot compile pattern \"%s\": %s\n", current->pattern, error);
 #endif
@@ -1330,7 +1332,8 @@ static int regression_tests(void)
 				pcre32_free(re32);
 				re32 = NULL;
 			}
-			extra32->flags |= PCRE_EXTRA_MARK;
+			else
+				extra32->flags |= PCRE_EXTRA_MARK;
 		} else if (((utf && ucp) || is_ascii) && !(current->start_offset & F_NO32))
 			printf("\n32 bit: Cannot compile pattern \"%s\": %s\n", current->pattern, error);
 #endif
