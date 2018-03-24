@@ -212,6 +212,17 @@ static const char *const pstring[] = {
   "match failed"                     /* NOMATCH    */
 };
 
+#define PCREPOSIX_JIT_MAGIC 0x50435258UL /* PCRX */
+#define GET_MAGIC(p) (((const pcrx_t *)(p))->magic_number)
+
+/* internal regex_t re_impl struct */
+typedef struct {
+  pcre_uint32 magic_number;
+  pcre_uint32 size;
+  pcre *re_pcre;
+  pcre_extra *re_pcre_extra;
+} pcrx_t;
+
 
 
 
@@ -257,8 +268,67 @@ return length + addlength;
 PCREPOSIX_EXP_DEFN void PCRE_CALL_CONVENTION
 regfree(regex_t *preg)
 {
+if (preg == NULL || preg->re_impl == NULL)
+  return;
+if (GET_MAGIC(preg->re_impl) == PCREPOSIX_JIT_MAGIC)
+  {
+  pcrx_t *pjit = (pcrx_t *)preg->re_impl;
+  if (pjit->re_pcre_extra)
+    pcre_free_study(pjit->re_pcre_extra);
+  preg->re_impl = pjit->re_pcre;
+  (PUBL(free))(pjit);
+  }
 if (preg->re_impl != NULL)
   (PUBL(free))(preg->re_impl);
+}
+
+
+
+
+/*************************************************
+*      Jitify a compiled regular expression      *
+*************************************************/
+
+/*
+Arguments:
+  preg        points to a structure with the compiled expression
+
+Returns:      adds JIT compilation data if supported
+*/
+
+static void
+regcomp_jit(regex_t *preg)
+{
+pcrx_t *pjit;
+pcre *re_pcre;
+const char *errorptr;
+int hasjit = 0;
+
+if (!preg || !preg->re_impl ||
+    pcre_config(PCRE_CONFIG_JIT, &hasjit) != 0 || !hasjit)
+  return;
+
+pjit = (pcrx_t *)(PUBL(malloc))(sizeof(pcrx_t));
+if (!pjit)
+  return;
+re_pcre = (pcre *)preg->re_impl;
+hasjit = 0;
+errorptr = NULL;
+pjit->re_pcre_extra = NULL;
+pjit->re_pcre_extra = pcre_study(re_pcre, PCRE_STUDY_JIT_COMPILE, &errorptr);
+if (!pjit->re_pcre_extra || errorptr != NULL ||
+    pcre_fullinfo(re_pcre, pjit->re_pcre_extra, PCRE_INFO_JIT, &hasjit) != 0 ||
+    !hasjit)
+  {
+  if (pjit->re_pcre_extra)
+    pcre_free_study(pjit->re_pcre_extra);
+  (PUBL(free))(pjit);
+  return;
+  }
+pjit->size = (pcre_uint32)-1L;
+pjit->re_pcre = re_pcre;
+pjit->magic_number = PCREPOSIX_JIT_MAGIC;
+preg->re_impl = pjit;
 }
 
 
@@ -388,6 +458,7 @@ if (preg->re_impl == NULL)
 (void)pcre_fullinfo((const pcre *)preg->re_impl, NULL, PCRE_INFO_CAPTURECOUNT,
   &re_nsub);
 preg->re_nsub = (size_t)re_nsub;
+regcomp_jit(preg);
 return 0;
 }
 
@@ -420,12 +491,24 @@ int *ovector = NULL;
 int small_ovector[POSIX_MALLOC_THRESHOLD * 3];
 BOOL allocated_ovector = FALSE;
 BOOL nosub;
+const pcre *re_pcre = NULL;
+const pcre_extra *re_pcre_extra = NULL;
 
-if (preg == NULL) return REG_INVARG;
+if (preg == NULL || preg->re_impl == NULL) return REG_INVARG;
 if ((eflags & REGEXEC_OPTIONS) != eflags) return REG_INVARG;
 
+if (GET_MAGIC(preg->re_impl) == PCREPOSIX_JIT_MAGIC)
+  {
+  pcrx_t *pjit = (pcrx_t *)preg->re_impl;
+  re_pcre_extra = pjit->re_pcre_extra;
+  re_pcre = pjit->re_pcre;
+  if (re_pcre == NULL) return REG_INVARG;
+  }
+else
+  re_pcre = (pcre *)preg->re_impl;
+
 nosub =
-  (REAL_PCRE_OPTIONS((const pcre *)preg->re_impl) & PCRE_NO_AUTO_CAPTURE) != 0;
+  (REAL_PCRE_OPTIONS(re_pcre) & PCRE_NO_AUTO_CAPTURE) != 0;
 
 if ((eflags & REG_NOTBOL) != 0) options |= PCRE_NOTBOL;
 if ((eflags & REG_NOTEOL) != 0) options |= PCRE_NOTEOL;
@@ -476,8 +559,21 @@ else
 
 len = (int)(eo - so);
 if ((size_t)len != (eo - so)) return REG_INVARG;
-rc = pcre_exec((const pcre *)preg->re_impl, NULL, string + so, len,
-  0, options, ovector, (int)(nmatch * 3));
+if (re_pcre_extra != NULL)
+  {
+  pcre_jit_stack *jit_stack = pcre_jit_stack_alloc(4096, 65536);
+  if (jit_stack != NULL)
+    {
+    rc = pcre_jit_exec(re_pcre, re_pcre_extra, string + so, len,
+      0, options, ovector, (int)(nmatch * 3), jit_stack);
+    pcre_jit_stack_free(jit_stack);
+    }
+  else
+    rc = PCRE_ERROR_NOMEMORY;
+  }
+else
+  rc = pcre_exec(re_pcre, NULL, string + so, len,
+    0, options, ovector, (int)(nmatch * 3));
 
 if (rc == 0) rc = (int)nmatch;    /* All captured slots were filled in */
 
