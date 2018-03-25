@@ -4629,8 +4629,7 @@ for (;; ptr++)
       }
     else if (c == CHAR_BACKSLASH &&
              !((CHAR_1 <= ptr[1] && ptr[1] <= CHAR_9) || ptr[1] == CHAR_DOT ||
-               ptr[1] == CHAR_BACKSLASH || ptr[1] == CHAR_PLUS ||
-               ptr[1] == CHAR_QUESTION_MARK || ptr[1] == CHAR_VERTICAL_LINE ||
+               ptr[1] == CHAR_BACKSLASH ||
                ptr[1] == CHAR_LEFT_SQUARE_BRACKET || ptr[1] == CHAR_ASTERISK ||
                ptr[1] == CHAR_CIRCUMFLEX_ACCENT || ptr[1] == CHAR_DOLLAR_SIGN))
       {
@@ -8152,7 +8151,7 @@ for (;; ptr++)
         single group (i.e. not to a duplicated name. */
 
         HANDLE_REFERENCE:
-        if (firstcharflags == REQ_UNSET) firstcharflags = REQ_NONE;
+        if (firstcharflags == REQ_UNSET) zerofirstcharflags = firstcharflags = REQ_NONE;
         previous = code;
         item_hwm_offset = cd->hwm - cd->start_workspace;
         *code++ = ((options & PCRE_CASELESS) != 0)? OP_REFI : OP_REF;
