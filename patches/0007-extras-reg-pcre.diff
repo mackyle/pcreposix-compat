@@ -118,21 +118,19 @@ Note: This patch is licensed under the same terms as PCRE itself.
 Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
 
 ---
- pcreposix.c |  39 +++++++++++++++++----
+ pcreposix.c |  37 +++++++++++++++++---
  pcreposix.h | 112 ++++++++++++++++++++++++++++++++++++++++++++++--------------
- 2 files changed, 120 insertions(+), 31 deletions(-)
+ 2 files changed, 119 insertions(+), 30 deletions(-)
 
 diff --git a/pcreposix.c b/pcreposix.c
-index 3cd9f401..a4fbdf6a 100644
+index 71f791e2..6ec4a288 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
-@@ -6,7 +6,9 @@
- and semantics are as close as possible to those of the Perl 5 language.
+@@ -7,6 +7,8 @@ and semantics are as close as possible to those of the Perl 5 language.
  
                         Written by Philip Hazel
--           Copyright (c) 1997-2017 University of Cambridge
-+           Copyright (C) 1997-2017 University of Cambridge
-+           Copyright (C) 2017 Kyle J. McKay <mackyle@gmail.com>
+            Copyright (c) 1997-2018 University of Cambridge
++           Copyright (C) 2017-2018 Kyle J. McKay <mackyle@gmail.com>
 +           All Rights Reserved
  
  -----------------------------------------------------------------------------
@@ -351,4 +349,4 @@ index 248f7977..413fc566 100644
  
 
 -- 
-tg: (28943d65..) t/extras-reg-pcre (depends on: t/posix-reg-extended)
+tg: (3d461533..) t/extras-reg-pcre (depends on: t/posix-reg-extended)

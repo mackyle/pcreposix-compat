@@ -19,7 +19,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  5 files changed, 16 insertions(+), 7 deletions(-)
 
 diff --git a/pcre.h.generic b/pcre.h.generic
-index 6041716f..b88d5c41 100644
+index ce71b928..8bbdebbc 100644
 --- a/pcre.h.generic
 +++ b/pcre.h.generic
 @@ -173,6 +173,7 @@ with J. */
@@ -31,7 +31,7 @@ index 6041716f..b88d5c41 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre.h.in b/pcre.h.in
-index 07e43a1b..8d1bb7bb 100644
+index 37245f8b..bb895392 100644
 --- a/pcre.h.in
 +++ b/pcre.h.in
 @@ -173,6 +173,7 @@ with J. */
@@ -43,7 +43,7 @@ index 07e43a1b..8d1bb7bb 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre_compile.c b/pcre_compile.c
-index 59f1166f..ea409e71 100644
+index c39b4278..6b8b356a 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -4496,6 +4496,7 @@ pcre_uchar *orig_code = code;
@@ -54,7 +54,7 @@ index 59f1166f..ea409e71 100644
  BOOL embednul = (cd->extended_options & PCRE_ALLOW_EMBEDDED_NUL_BIT) != 0;
  BOOL groupsetfirstchar = FALSE;
  const pcre_uchar *ptr = *ptrptr;
-@@ -4948,7 +4949,7 @@ for (;; ptr++)
+@@ -4947,7 +4948,7 @@ for (;; ptr++)
      for (;;)
        {
        c = *(++ptr);
@@ -63,7 +63,7 @@ index 59f1166f..ea409e71 100644
          {
          if (ptr[1] == CHAR_E)
            ptr++;
-@@ -5251,7 +5252,7 @@ for (;; ptr++)
+@@ -5250,7 +5251,7 @@ for (;; ptr++)
        as literal characters (by default), or are faulted if
        PCRE_EXTRA is set. */
  
@@ -72,7 +72,7 @@ index 59f1166f..ea409e71 100644
          {
          escape = check_escape(&ptr, &ec, errorcodeptr, cd->bracount, options,
            TRUE);
-@@ -5402,7 +5403,7 @@ for (;; ptr++)
+@@ -5401,7 +5402,7 @@ for (;; ptr++)
        code for handling \Q and \E is messy. */
  
        CHECK_RANGE:
@@ -81,7 +81,7 @@ index 59f1166f..ea409e71 100644
          {
          inescq = FALSE;
          ptr += 2;
-@@ -5419,12 +5420,12 @@ for (;; ptr++)
+@@ -5418,12 +5419,12 @@ for (;; ptr++)
          {
          pcre_uint32 d;
          ptr += 2;
@@ -96,7 +96,7 @@ index 59f1166f..ea409e71 100644
            {
            ptr += 2;
            if (*ptr == CHAR_BACKSLASH && ptr[1] == CHAR_E)
-@@ -5461,7 +5462,7 @@ for (;; ptr++)
+@@ -5460,7 +5461,7 @@ for (;; ptr++)
  
          if (!inescq)
            {
@@ -127,7 +127,7 @@ index ce53995b..11b4aed2 100644
  #if (PUBLIC_COMPILE_OPTIONS & PUBLIC_EXTENDED_COMPILE_OPTIONS) != 0
  #error PUBLIC_EXTENDED_COMPILE_OPTIONS conflicts with PUBLIC_COMPILE_OPTIONS
 diff --git a/pcreposix.c b/pcreposix.c
-index 0350dd44..3cd9f401 100644
+index 1f1a4b2c..71f791e2 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -331,6 +331,7 @@ else if (pattern == NULL) return REG_INVARG;
@@ -140,4 +140,4 @@ index 0350dd44..3cd9f401 100644
  
 
 -- 
-tg: (d2ff070b..) t/posix-reg-extended (depends on: t/compat-reg-pend)
+tg: (80566850..) t/posix-reg-extended (depends on: t/compat-reg-pend)

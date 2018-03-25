@@ -18,12 +18,12 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
 ---
  CMakeLists.txt          |   9 +++-
  Makefile.am             |  11 ++++-
- Makefile.in             | 128 ++++++++++++++++++++++++++++++++++++------------
+ Makefile.in             | 126 +++++++++++++++++++++++++++++++++++++-----------
  configure               |   2 +-
  configure.ac            |   2 +-
  doc/html/pcreposix.html |   2 +-
  doc/pcreposix.3         |   2 +-
- 7 files changed, 118 insertions(+), 38 deletions(-)
+ 7 files changed, 117 insertions(+), 37 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 858a34bd..213d5393 100644
@@ -90,7 +90,7 @@ index 22b69471..9d11b076 100644
  # These additional headers will be be installed if C++ support is enabled. We
  # do not distribute pcrecpparg.h or pcre_stringpiece.h, as these are generated
 diff --git a/Makefile.in b/Makefile.in
-index 9c8ccecb..ff33ac09 100644
+index 156cb77f..1d1ac319 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -172,7 +172,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -137,12 +137,7 @@ index 9c8ccecb..ff33ac09 100644
  MAKEINFO = @MAKEINFO@
  MANIFEST_TOOL = @MANIFEST_TOOL@
  MKDIR_P = @MKDIR_P@
-@@ -988,12 +996,13 @@ dist_noinst_DATA = $(pcrecpp_html)
- # The Libtool libraries to install.  We'll add to this later.
- lib_LTLIBRARIES = $(am__append_4) $(am__append_5) $(am__append_6) \
- 	$(am__append_20) $(am__append_22)
--check_SCRIPTS =
-+check_SCRIPTS = 
+@@ -992,8 +1000,9 @@ check_SCRIPTS =
  dist_noinst_SCRIPTS = RunTest $(am__append_39)
  
  # Additional files to delete on 'make clean' and 'make maintainer-clean'.
@@ -198,8 +193,8 @@ index 9c8ccecb..ff33ac09 100644
  stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
  	@rm -f stamp-h1
  	cd $(top_builddir) && $(SHELL) ./config.status config.h
--$(srcdir)/config.h.in:  $(am__configure_deps)
-+$(MM)$(srcdir)/config.h.in:  $(am__configure_deps)
+-$(srcdir)/config.h.in:  $(am__configure_deps) 
++$(MM)$(srcdir)/config.h.in:  $(am__configure_deps) 
  	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
  	rm -f stamp-h1
  	touch $@
@@ -345,27 +340,27 @@ index 9c8ccecb..ff33ac09 100644
  @WITH_REBUILD_CHARTABLES_TRUE@	./dftables$(EXEEXT) $@
  
 diff --git a/configure b/configure
-index 6fe8854a..82053283 100755
+index 0d05374f..6bca9d73 100755
 --- a/configure
 +++ b/configure
-@@ -19667,7 +19667,7 @@ EXTRA_LIBPCRE32_LDFLAGS="$EXTRA_LIBPCRE32_LDFLAGS \
-                        $NO_UNDEFINED -version-info 0:9:0"
+@@ -19723,7 +19723,7 @@ EXTRA_LIBPCRE32_LDFLAGS="$EXTRA_LIBPCRE32_LDFLAGS \
+                        $NO_UNDEFINED -version-info 0:10:0"
  
  EXTRA_LIBPCREPOSIX_LDFLAGS="$EXTRA_LIBPCREPOSIX_LDFLAGS \
--                            $NO_UNDEFINED -version-info 0:5:0"
+-                            $NO_UNDEFINED -version-info 0:6:0"
 +                            $NO_UNDEFINED -version-info 1:0:0"
  
  EXTRA_LIBPCRECPP_LDFLAGS="$EXTRA_LIBPCRECPP_LDFLAGS \
                            $NO_UNDEFINED -version-info 0:1:0 \
 diff --git a/configure.ac b/configure.ac
-index 718a1850..42176fa3 100644
+index dcdef6a9..fed49879 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -20,7 +20,7 @@ m4_define(pcre_date, [2017-07-05])
- m4_define(libpcre_version, [3:9:2])
- m4_define(libpcre16_version, [2:9:2])
- m4_define(libpcre32_version, [0:9:0])
--m4_define(libpcreposix_version, [0:5:0])
+@@ -20,7 +20,7 @@ m4_define(pcre_date, [2018-03-20])
+ m4_define(libpcre_version, [3:10:2])
+ m4_define(libpcre16_version, [2:10:2])
+ m4_define(libpcre32_version, [0:10:0])
+-m4_define(libpcreposix_version, [0:6:0])
 +m4_define(libpcreposix_version, [1:0:0])
  m4_define(libpcrecpp_version, [0:1:0])
  
@@ -398,4 +393,4 @@ index 78ed0729..a19235e9 100644
  .B int regcomp(regex_t *\fIpreg\fP, const char *\fIpattern\fP,
 
 -- 
-tg: (c9f10093..) t/compat-version (depends on: t/compat-reg-startend)
+tg: (9aa8048e..) t/compat-version (depends on: t/auto-jit)

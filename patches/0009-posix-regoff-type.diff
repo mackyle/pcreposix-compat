@@ -18,7 +18,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  2 files changed, 22 insertions(+), 8 deletions(-)
 
 diff --git a/pcreposix.c b/pcreposix.c
-index a4fbdf6a..50c7c485 100644
+index 6ec4a288..2d99715c 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -412,7 +412,8 @@ PCREPOSIX_EXP_DEFN int PCRE_CALL_CONVENTION
@@ -61,10 +61,10 @@ index a4fbdf6a..50c7c485 100644
      {
      for (i = 0; i < (size_t)rc; i++)
        {
--      pmatch[i].rm_so = ovector[i*2] + so;
--      pmatch[i].rm_eo = ovector[i*2+1] + so;
-+      pmatch[i].rm_so = (regoff_t)ovector[i*2] + (regoff_t)so;
-+      pmatch[i].rm_eo = (regoff_t)ovector[i*2+1] + (regoff_t)so;
+-      pmatch[i].rm_so = (ovector[i*2] < 0)? -1 : ovector[i*2] + so;
+-      pmatch[i].rm_eo = (ovector[i*2+1] < 0)? -1: ovector[i*2+1] + so;
++      pmatch[i].rm_so = (ovector[i*2] < 0)? (regoff_t)-1 : (regoff_t)ovector[i*2] + (regoff_t)so;
++      pmatch[i].rm_eo = (ovector[i*2+1] < 0)? (regoff_t)-1: (regoff_t)ovector[i*2+1] + (regoff_t)so;
        }
      if (allocated_ovector) free(ovector);
      for (; i < nmatch; i++) pmatch[i].rm_so = pmatch[i].rm_eo = -1;
@@ -91,4 +91,4 @@ index e1c0a044..11a5c9f6 100644
    regoff_t rm_so;
 
 -- 
-tg: (50695d1e..) t/posix-regoff-type (depends on: t/posix-defines-not-enum)
+tg: (00de47e5..) t/posix-regoff-type (depends on: t/posix-defines-not-enum)

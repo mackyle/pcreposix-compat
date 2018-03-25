@@ -37,7 +37,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  9 files changed, 38 insertions(+), 6 deletions(-)
 
 diff --git a/pcre.h.generic b/pcre.h.generic
-index 4318f9a5..dbdf03c3 100644
+index 520973c2..808eb4f1 100644
 --- a/pcre.h.generic
 +++ b/pcre.h.generic
 @@ -171,6 +171,7 @@ with J. */
@@ -49,7 +49,7 @@ index 4318f9a5..dbdf03c3 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre.h.in b/pcre.h.in
-index fc54c00c..1aac471e 100644
+index 3559f436..c7b10a75 100644
 --- a/pcre.h.in
 +++ b/pcre.h.in
 @@ -171,6 +171,7 @@ with J. */
@@ -61,7 +61,7 @@ index fc54c00c..1aac471e 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre_compile.c b/pcre_compile.c
-index 1edad750..210fef6a 100644
+index 99d57378..1815c0f3 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -4488,7 +4488,7 @@ register pcre_uchar *code = *codeptr;
@@ -73,7 +73,7 @@ index 1edad750..210fef6a 100644
  BOOL basicre = (cd->extended_options & PCRE_POSIX_BASIC_ESC_BIT) != 0;
  BOOL groupsetfirstchar = FALSE;
  const pcre_uchar *ptr = *ptrptr;
-@@ -4694,7 +4694,8 @@ for (;; ptr++)
+@@ -4693,7 +4693,8 @@ for (;; ptr++)
  
    if (c != CHAR_NULL)
      {
@@ -83,7 +83,7 @@ index 1edad750..210fef6a 100644
        {
        inescq = FALSE;
        ptr++;
-@@ -9211,7 +9212,7 @@ cd->external_flags = 0;   /* Initialize here for LIMIT_MATCH/RECURSION */
+@@ -9210,7 +9211,7 @@ cd->external_flags = 0;   /* Initialize here for LIMIT_MATCH/RECURSION */
  
  while (ptr[skipatstart] == CHAR_LEFT_PARENTHESIS &&
         ptr[skipatstart+1] == CHAR_ASTERISK &&
@@ -109,7 +109,7 @@ index fc4b1b9a..cc3ab4e1 100644
  #if (PUBLIC_COMPILE_OPTIONS & PUBLIC_EXTENDED_COMPILE_OPTIONS) != 0
  #error PUBLIC_EXTENDED_COMPILE_OPTIONS conflicts with PUBLIC_COMPILE_OPTIONS
 diff --git a/pcreposix.c b/pcreposix.c
-index e8c4748e..c8320281 100644
+index ef8cf6b9..82d40c1d 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -284,6 +284,7 @@ if ((cflags & REG_NOSUB) != 0)    options |= PCRE_NO_AUTO_CAPTURE;
@@ -169,7 +169,7 @@ index f4836df9..6f633431 100644
  /a\Cb/
      aXb
 diff --git a/testdata/testoutput14 b/testdata/testoutput14
-index 5b7f6067..f29a9ec3 100644
+index 85a538ad..f57de3c1 100644
 --- a/testdata/testoutput14
 +++ b/testdata/testoutput14
 @@ -206,7 +206,21 @@ No match: POSIX code 17: match failed
@@ -197,4 +197,4 @@ index 5b7f6067..f29a9ec3 100644
      aXb
 
 -- 
-tg: (4cbf9da3..) t/compat-reg-nospec (depends on: t/posix-reg-basic)
+tg: (94e6200b..) t/compat-reg-nospec (depends on: t/posix-reg-basic)

@@ -71,7 +71,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  6 files changed, 164 insertions(+), 10 deletions(-)
 
 diff --git a/pcre.h.generic b/pcre.h.generic
-index dbdf03c3..6041716f 100644
+index 808eb4f1..ce71b928 100644
 --- a/pcre.h.generic
 +++ b/pcre.h.generic
 @@ -172,6 +172,7 @@ with J. */
@@ -83,7 +83,7 @@ index dbdf03c3..6041716f 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre.h.in b/pcre.h.in
-index 1aac471e..07e43a1b 100644
+index c7b10a75..37245f8b 100644
 --- a/pcre.h.in
 +++ b/pcre.h.in
 @@ -172,6 +172,7 @@ with J. */
@@ -95,7 +95,7 @@ index 1aac471e..07e43a1b 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre_compile.c b/pcre_compile.c
-index 210fef6a..59f1166f 100644
+index 1815c0f3..c39b4278 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -285,6 +285,12 @@ static const pcre_uchar sub_implicit_rsb_newline[] = {
@@ -133,7 +133,7 @@ index 210fef6a..59f1166f 100644
    if (nestptr == NULL && !inescq && basicre)
      {
      if (c == CHAR_LEFT_PARENTHESIS || c == CHAR_RIGHT_PARENTHESIS ||
-@@ -4692,7 +4706,8 @@ for (;; ptr++)
+@@ -4691,7 +4705,8 @@ for (;; ptr++)
    /* If in \Q...\E, check for the end; if not, we have a literal. Otherwise an
    isolated \E is ignored. */
  
@@ -143,7 +143,7 @@ index 210fef6a..59f1166f 100644
      {
      if (c == CHAR_BACKSLASH && ptr[1] == CHAR_E &&
          (cd->extended_options & PCRE_VERBATIM_BIT) == 0)
-@@ -4738,7 +4753,7 @@ for (;; ptr++)
+@@ -4737,7 +4752,7 @@ for (;; ptr++)
      if (c == CHAR_NUMBER_SIGN)
        {
        ptr++;
@@ -152,7 +152,7 @@ index 210fef6a..59f1166f 100644
          {
          if (IS_NEWLINE(ptr))         /* For non-fixed-length newline cases, */
            {                          /* IS_NEWLINE sets cd->nllen. */
-@@ -4766,7 +4781,9 @@ for (;; ptr++)
+@@ -4765,7 +4780,9 @@ for (;; ptr++)
        ptr[2] == CHAR_NUMBER_SIGN && (!basicre || nestptr))
      {
      ptr += 3;
@@ -163,7 +163,7 @@ index 210fef6a..59f1166f 100644
      if (*ptr == CHAR_NULL)
        {
        *errorcodeptr = ERR18;
-@@ -5015,6 +5032,13 @@ for (;; ptr++)
+@@ -5014,6 +5031,13 @@ for (;; ptr++)
        c = *ptr;
        }
  
@@ -177,7 +177,7 @@ index 210fef6a..59f1166f 100644
      /* Process characters until ] is reached. By writing this as a "do" it
      means that an initial ] is taken as a data character. At the start of the
      loop, c contains the first byte of the character. */
-@@ -5590,7 +5614,10 @@ for (;; ptr++)
+@@ -5589,7 +5613,10 @@ for (;; ptr++)
  
      while (((c = *(++ptr)) != CHAR_NULL ||
             (nestptr != NULL &&
@@ -189,7 +189,7 @@ index 210fef6a..59f1166f 100644
             (c != CHAR_RIGHT_SQUARE_BRACKET || inescq));
  
      /* Check for missing terminating ']' */
-@@ -5783,7 +5810,7 @@ for (;; ptr++)
+@@ -5782,7 +5809,7 @@ for (;; ptr++)
          while (MAX_255(*p) && (cd->ctypes[*p] & ctype_space) != 0) p++;
          if (*p != CHAR_NUMBER_SIGN) break;
          p++;
@@ -198,7 +198,7 @@ index 210fef6a..59f1166f 100644
            {
            if (IS_NEWLINE(p))         /* For non-fixed-length newline cases, */
              {                        /* IS_NEWLINE sets cd->nllen. */
-@@ -7822,6 +7849,8 @@ for (;; ptr++)
+@@ -7821,6 +7848,8 @@ for (;; ptr++)
      tempbracount = cd->bracount;          /* Save value before bracket */
      length_prevgroup = 0;                 /* Initialize for pre-compile phase */
  
@@ -207,7 +207,7 @@ index 210fef6a..59f1166f 100644
      if (!compile_regex(
           newoptions,                      /* The complete new option state */
           &tempcode,                       /* Where to put code (updated) */
-@@ -7843,6 +7872,8 @@ for (;; ptr++)
+@@ -7842,6 +7871,8 @@ for (;; ptr++)
             &length_prevgroup              /* Pre-compile phase */
           ))
        goto FAILED;
@@ -216,7 +216,7 @@ index 210fef6a..59f1166f 100644
  
      cd->parens_depth -= 1;
  
-@@ -9132,6 +9163,7 @@ size_t size;
+@@ -9131,6 +9162,7 @@ size_t size;
  pcre_uchar *code;
  const pcre_uchar *codestart;
  const pcre_uchar *ptr;
@@ -224,7 +224,7 @@ index 210fef6a..59f1166f 100644
  compile_data compile_block;
  compile_data *cd = &compile_block;
  
-@@ -9192,6 +9224,7 @@ if ((options & ~(PUBLIC_COMPILE_OPTIONS | PUBLIC_EXTENDED_COMPILE_OPTIONS)) != 0
+@@ -9191,6 +9223,7 @@ if ((options & ~(PUBLIC_COMPILE_OPTIONS | PUBLIC_EXTENDED_COMPILE_OPTIONS)) != 0
      (((options & PCRE_XC1OPTIONS) == 0) &&
       (options & (PUBLIC_EXTENDED_COMPILE_OPTIONS & ~PCRE_XC1OPTIONS)) != 0))
    {
@@ -232,7 +232,7 @@ index 210fef6a..59f1166f 100644
    errorcode = ERR17;
    goto PCRE_EARLY_ERROR_RETURN;
    }
-@@ -9201,6 +9234,54 @@ if ((options & ~(PUBLIC_COMPILE_OPTIONS | PUBLIC_EXTENDED_COMPILE_OPTIONS)) != 0
+@@ -9200,6 +9233,54 @@ if ((options & ~(PUBLIC_COMPILE_OPTIONS | PUBLIC_EXTENDED_COMPILE_OPTIONS)) != 0
  options2 = options & (PUBLIC_EXTENDED_COMPILE_OPTIONS & ~PCRE_XC1OPTIONS);
  options &= ~PUBLIC_EXTENDED_COMPILE_OPTIONS;
  
@@ -287,7 +287,7 @@ index 210fef6a..59f1166f 100644
  /* If PCRE_NEVER_UTF is set, remember it. */
  
  if ((options & PCRE_NEVER_UTF) != 0) never_utf = TRUE;
-@@ -9434,7 +9515,10 @@ cd->workspace_size = COMPILE_WORK_SIZE;
+@@ -9433,7 +9514,10 @@ cd->workspace_size = COMPILE_WORK_SIZE;
  cd->named_groups = named_groups;
  cd->named_group_list_size = NAMED_GROUP_LIST_SIZE;
  cd->start_pattern = (const pcre_uchar *)pattern;
@@ -334,7 +334,7 @@ index cc3ab4e1..ce53995b 100644
  #if (PUBLIC_COMPILE_OPTIONS & PUBLIC_EXTENDED_COMPILE_OPTIONS) != 0
  #error PUBLIC_EXTENDED_COMPILE_OPTIONS conflicts with PUBLIC_COMPILE_OPTIONS
 diff --git a/pcreposix.c b/pcreposix.c
-index c8320281..0350dd44 100644
+index 82d40c1d..1f1a4b2c 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -269,13 +269,71 @@ PCREPOSIX_EXP_DEFN int PCRE_CALL_CONVENTION
@@ -440,4 +440,4 @@ index 853d3326..248f7977 100644
  /* The structure in which a captured offset is returned. */
 
 -- 
-tg: (5c2c2c30..) t/compat-reg-pend (depends on: t/compat-reg-nospec)
+tg: (e3b3a67f..) t/compat-reg-pend (depends on: t/compat-reg-nospec)

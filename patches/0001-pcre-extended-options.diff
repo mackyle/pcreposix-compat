@@ -49,7 +49,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  2 files changed, 25 insertions(+), 1 deletion(-)
 
 diff --git a/pcre_compile.c b/pcre_compile.c
-index 42f204cd..c95b7c61 100644
+index 6dd88860..e5af9d1c 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -9063,6 +9063,7 @@ pcre_uint32 firstchar, reqchar;
@@ -124,4 +124,4 @@ index 97ff55d0..c04f2ff6 100644
    BOOL had_accept;                  /* (*ACCEPT) encountered */
 
 -- 
-tg: (bd65c17e..) t/pcre-extended-options (depends on: t/vendor)
+tg: (1aadf288..) t/pcre-extended-options (depends on: t/vendor)

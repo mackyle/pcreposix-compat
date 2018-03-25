@@ -1,0 +1,254 @@
+From: Kyle J. McKay <mackyle@gmail.com>
+Subject: [PATCH] pcreposix: make regcomp use JIT if available
+
+If JIT is available, attempt to compile the pattern for JIT
+at regcomp time in pcreposix.c.
+
+If that fails, silently fall back to normal non-JIT operation.
+
+Some patterns will not JIT compile in any case so the fallback
+must always be present.  It's very little extra work to attempt
+to JIT compile the pattern when supported.
+
+Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
+
+---
+ pcreposix.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ pcreposix.h |   2 +-
+ pcretest.c  |   7 ++--
+ 3 files changed, 111 insertions(+), 13 deletions(-)
+
+diff --git a/pcreposix.c b/pcreposix.c
+index 2d99715c..52751d5f 100644
+--- a/pcreposix.c
++++ b/pcreposix.c
+@@ -212,6 +212,17 @@ static const char *const pstring[] = {
+   "match failed"                     /* NOMATCH    */
+ };
+ 
++#define PCREPOSIX_JIT_MAGIC 0x50435258UL /* PCRX */
++#define GET_MAGIC(p) (((const pcrx_t *)(p))->magic_number)
++
++/* internal regex_t re_impl struct */
++typedef struct {
++  pcre_uint32 magic_number;
++  pcre_uint32 size;
++  pcre *re_pcre;
++  pcre_extra *re_pcre_extra;
++} pcrx_t;
++
+ 
+ 
+ 
+@@ -257,7 +268,67 @@ return length + addlength;
+ PCREPOSIX_EXP_DEFN void PCRE_CALL_CONVENTION
+ regfree(regex_t *preg)
+ {
+-(PUBL(free))(preg->re_pcre);
++if (preg == NULL || preg->re_impl == NULL)
++  return;
++if (GET_MAGIC(preg->re_impl) == PCREPOSIX_JIT_MAGIC)
++  {
++  pcrx_t *pjit = (pcrx_t *)preg->re_impl;
++  if (pjit->re_pcre_extra)
++    pcre_free_study(pjit->re_pcre_extra);
++  preg->re_impl = pjit->re_pcre;
++  (PUBL(free))(pjit);
++  }
++if (preg->re_impl != NULL)
++  (PUBL(free))(preg->re_impl);
++}
++
++
++
++
++/*************************************************
++*      Jitify a compiled regular expression      *
++*************************************************/
++
++/*
++Arguments:
++  preg        points to a structure with the compiled expression
++
++Returns:      adds JIT compilation data if supported
++*/
++
++static void
++regcomp_jit(regex_t *preg)
++{
++pcrx_t *pjit;
++pcre *re_pcre;
++const char *errorptr;
++int hasjit = 0;
++
++if (!preg || !preg->re_impl ||
++    pcre_config(PCRE_CONFIG_JIT, &hasjit) != 0 || !hasjit)
++  return;
++
++pjit = (pcrx_t *)(PUBL(malloc))(sizeof(pcrx_t));
++if (!pjit)
++  return;
++re_pcre = (pcre *)preg->re_impl;
++hasjit = 0;
++errorptr = NULL;
++pjit->re_pcre_extra = NULL;
++pjit->re_pcre_extra = pcre_study(re_pcre, PCRE_STUDY_JIT_COMPILE, &errorptr);
++if (!pjit->re_pcre_extra || errorptr != NULL ||
++    pcre_fullinfo(re_pcre, pjit->re_pcre_extra, PCRE_INFO_JIT, &hasjit) != 0 ||
++    !hasjit)
++  {
++  if (pjit->re_pcre_extra)
++    pcre_free_study(pjit->re_pcre_extra);
++  (PUBL(free))(pjit);
++  return;
++  }
++pjit->size = (pcre_uint32)-1L;
++pjit->re_pcre = re_pcre;
++pjit->magic_number = PCREPOSIX_JIT_MAGIC;
++preg->re_impl = pjit;
+ }
+ 
+ 
+@@ -290,7 +361,7 @@ const char *vptrs[4];
+ char altpattern[(sizeof(void *) * 2) + 1];
+ 
+ if (preg == NULL) return REG_INVARG;
+-preg->re_pcre = NULL;
++preg->re_impl = NULL;
+ if ((cflags & REGCOMP_OPTIONS) != cflags) return REG_INVARG;
+ 
+ if ((cflags & REG_PEND) != 0)
+@@ -370,7 +441,7 @@ if ((cflags & (REG_PCRE|REG_JAVASCPT)) == 0)
+   if ((cflags & REG_NEWLINE) != 0)  options |= PCRE_NOT_EXCLUDES_NL;
+   }
+ 
+-preg->re_pcre = pcre_compile2(pattern, options, &errorcode, &errorptr,
++preg->re_impl = pcre_compile2(pattern, options, &errorcode, &errorptr,
+   &erroffset, NULL);
+ preg->re_erroffset = erroffset;
+ if (dupez) free(dupez);
+@@ -378,15 +449,16 @@ if (dupez) free(dupez);
+ /* Safety: if the error code is too big for the translation vector (which
+ should not happen, but we all make mistakes), return REG_BADPAT. */
+ 
+-if (preg->re_pcre == NULL)
++if (preg->re_impl == NULL)
+   {
+   return (errorcode < (int)(sizeof(eint)/sizeof(const int)))?
+     eint[errorcode] : REG_BADPAT;
+   }
+ 
+-(void)pcre_fullinfo((const pcre *)preg->re_pcre, NULL, PCRE_INFO_CAPTURECOUNT,
++(void)pcre_fullinfo((const pcre *)preg->re_impl, NULL, PCRE_INFO_CAPTURECOUNT,
+   &re_nsub);
+ preg->re_nsub = (size_t)re_nsub;
++regcomp_jit(preg);
+ return 0;
+ }
+ 
+@@ -419,12 +491,24 @@ int *ovector = NULL;
+ int small_ovector[POSIX_MALLOC_THRESHOLD * 3];
+ BOOL allocated_ovector = FALSE;
+ BOOL nosub;
++const pcre *re_pcre = NULL;
++const pcre_extra *re_pcre_extra = NULL;
+ 
+-if (preg == NULL) return REG_INVARG;
++if (preg == NULL || preg->re_impl == NULL) return REG_INVARG;
+ if ((eflags & REGEXEC_OPTIONS) != eflags) return REG_INVARG;
+ 
++if (GET_MAGIC(preg->re_impl) == PCREPOSIX_JIT_MAGIC)
++  {
++  pcrx_t *pjit = (pcrx_t *)preg->re_impl;
++  re_pcre_extra = pjit->re_pcre_extra;
++  re_pcre = pjit->re_pcre;
++  if (re_pcre == NULL) return REG_INVARG;
++  }
++else
++  re_pcre = (pcre *)preg->re_impl;
++
+ nosub =
+-  (REAL_PCRE_OPTIONS((const pcre *)preg->re_pcre) & PCRE_NO_AUTO_CAPTURE) != 0;
++  (REAL_PCRE_OPTIONS(re_pcre) & PCRE_NO_AUTO_CAPTURE) != 0;
+ 
+ if ((eflags & REG_NOTBOL) != 0) options |= PCRE_NOTBOL;
+ if ((eflags & REG_NOTEOL) != 0) options |= PCRE_NOTEOL;
+@@ -475,8 +559,21 @@ else
+ 
+ len = (int)(eo - so);
+ if ((size_t)len != (eo - so)) return REG_INVARG;
+-rc = pcre_exec((const pcre *)preg->re_pcre, NULL, string + so, len,
+-  0, options, ovector, (int)(nmatch * 3));
++if (re_pcre_extra != NULL)
++  {
++  pcre_jit_stack *jit_stack = pcre_jit_stack_alloc(4096, 65536);
++  if (jit_stack != NULL)
++    {
++    rc = pcre_jit_exec(re_pcre, re_pcre_extra, string + so, len,
++      0, options, ovector, (int)(nmatch * 3), jit_stack);
++    pcre_jit_stack_free(jit_stack);
++    }
++  else
++    rc = PCRE_ERROR_NOMEMORY;
++  }
++else
++  rc = pcre_exec(re_pcre, NULL, string + so, len,
++    0, options, ovector, (int)(nmatch * 3));
+ 
+ if (rc == 0) rc = (int)nmatch;    /* All captured slots were filled in */
+ 
+diff --git a/pcreposix.h b/pcreposix.h
+index 11a5c9f6..27b89653 100644
+--- a/pcreposix.h
++++ b/pcreposix.h
+@@ -156,7 +156,7 @@ also apply to REG_JAVASCPT but REG_JAVASCPT also sets PCRE_JAVASCRIPT_COMPAT. */
+ /* The structure representing a compiled regular expression. */
+ 
+ typedef struct {
+-  void *re_pcre;
++  void *re_impl; /* keep out */
+   size_t re_nsub;
+   size_t re_erroffset;
+   const char *re_endp; /* REG_PEND only */
+diff --git a/pcretest.c b/pcretest.c
+index 946c811e..f037e810 100644
+--- a/pcretest.c
++++ b/pcretest.c
+@@ -3018,6 +3018,7 @@ clock_t total_match_time = 0;
+ 
+ #if !defined NOPOSIX
+ int posix = 0;
++int cflags = 0;
+ #endif
+ #if !defined NODFA
+ int *dfa_workspace = NULL;
+@@ -3930,7 +3931,7 @@ while (!done)
+   if (posix || do_posix)
+     {
+     int rc;
+-    int cflags = do_posix < 2 ? REG_EXTENDED : REG_BASIC;
++    cflags = do_posix < 2 ? REG_EXTENDED : REG_BASIC;
+ 
+     if ((options & PCRE_CASELESS) != 0) cflags |= REG_ICASE;
+     if ((options & PCRE_MULTILINE) != 0) cflags |= REG_NEWLINE;
+@@ -5081,7 +5082,7 @@ while (!done)
+         (void)regerror(rc, &preg, (char *)buffer, buffer_size);
+         fprintf(outfile, "No match: POSIX code %d: %s\n", rc, buffer);
+         }
+-      else if ((REAL_PCRE_OPTIONS(preg.re_pcre) & PCRE_NO_AUTO_CAPTURE) != 0)
++      else if ((cflags & REG_NOSUB) != 0)
+         {
+         fprintf(outfile, "Matched with REG_NOSUB\n");
+         }
+@@ -5701,7 +5702,7 @@ while (!done)
+   CONTINUE:
+ 
+ #if !defined NOPOSIX
+-  if ((posix || do_posix) && preg.re_pcre != 0) regfree(&preg);
++  if ((posix || do_posix)) regfree(&preg);
+ #endif
+ 
+   if (re != NULL) new_free(re);
+
+-- 
+tg: (a8fceb7e..) t/auto-jit (depends on: t/posix-regoff-type t/pcre-jit-stubs)

@@ -14,15 +14,15 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  Makefile.am                                        |    5 +-
  Makefile.in                                        |    8 +-
  README                                             | 1002 --------------------
- README-GIT-REGEX                                   |  102 ++
+ README-GIT-REGEX                                   |  104 ++
  README-PCRE                                        | 1002 ++++++++++++++++++++
  README.md                                          |    1 +
- README.txt                                         |  489 ++++++++++
+ README.txt                                         |  533 +++++++++++
  config.mak                                         |   73 ++
  doc/html/pcreposix.html                            |    6 +
  doc/pcreposix.3                                    |    5 +
  .../7810-spurious-undefined-behavior-fail-fix.txt  |   36 +
- 12 files changed, 1727 insertions(+), 1005 deletions(-)
+ 12 files changed, 1773 insertions(+), 1005 deletions(-)
  create mode 100644 .gitattributes
  delete mode 100644 README
  create mode 100644 README-GIT-REGEX
@@ -58,7 +58,7 @@ index 9d11b076..bb56b4e8 100644
  # Note that pcrecpp.html is not in this list; it is listed separately below.
  
 diff --git a/Makefile.in b/Makefile.in
-index ff33ac09..1600d5c3 100644
+index 1d1ac319..b7f919e0 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -733,7 +733,8 @@ am__DIST_COMMON = $(dist_man_MANS) $(srcdir)/Makefile.in \
@@ -1093,10 +1093,10 @@ index 4887ebf3..00000000
 -Last updated: 10 February 2015
 diff --git a/README-GIT-REGEX b/README-GIT-REGEX
 new file mode 100644
-index 00000000..c534bc22
+index 00000000..1b0b2511
 --- /dev/null
 +++ b/README-GIT-REGEX
-@@ -0,0 +1,102 @@
+@@ -0,0 +1,104 @@
 +Using "pcreposix" With Git
 +==========================
 +
@@ -1183,9 +1183,9 @@ index 00000000..c534bc22
 +contortions are required to get a Git build on `Darwin` to use the new
 +"pcreposix" library in place of the bundled regex library.
 +
-+Add the contents of the contents of the `config.mak` file in this repository
-+to the end of your own (creating it if you don't have one already) in the
-+top-level of the Git distribution you wish to build.
++Add the contents of the `config.mak` file in this repository to the end of your
++ own (creating it if you don't have one already) in the top-level of the Git
++ distribution you wish to build.
 +
 +Adjust the `PCREPOSIXDIR` and optionally `PCREPOSIXINC` and/or `PCREPOSIXLIB`
 +settings as required to reflect the location of new pcreposix and pcre
@@ -1198,7 +1198,9 @@ index 00000000..c534bc22
 +applied to v2.11.1 to eliminate the spurious failure when using the
 +pcreposix-compat library as a regex.h substitute.  Git versions prior to
 +v2.11.1 will experience more spurious test failures from the t7810-grep test
-+which can also safely be ignored.
++which can also safely be ignored.  Current versions of the Git test suite code
++as of 2018-03 (approx. Git version 2.16.3) continue to rely on the same
++POSIX-undefined behavior in the t7810 test that's dealt with by the patch.
 diff --git a/README-PCRE b/README-PCRE
 new file mode 100644
 index 00000000..4887ebf3
@@ -2217,10 +2219,10 @@ index 00000000..c3ca0746
 \ No newline at end of file
 diff --git a/README.txt b/README.txt
 new file mode 100644
-index 00000000..8c53892a
+index 00000000..6e060559
 --- /dev/null
 +++ b/README.txt
-@@ -0,0 +1,489 @@
+@@ -0,0 +1,533 @@
 +PCRE POSIX Compat
 +=================
 +
@@ -2230,6 +2232,14 @@ index 00000000..8c53892a
 +POSIX compatibility updates for the "pcreposix" functionality provided with
 +the PCRE library so that "pcreposix.h" and the corresponding library may be
 +used as a standard POSIX "regex.h" substitute.
++
++In addition `pcre_jit_exec` stubs are included when building with
++`--disable-jit` and when building with `--enable-jit` `pcre_jit_exec` will
++automatically fall back to `pcre_exec` when no JIT compilation is available.
++This makes the library work more seamlessly whether in JIT mode or not (perhaps
++because JIT cannot handle the specific pattern or because the platform in
++question does not allow creation of writable plus executable memory for the JIT
++compilation) even when callers are not using the JIT API entirely correctly.
 +
 +See the "How to Use" section at the bottom if you're having a tl;dr moment.
 +
@@ -2557,6 +2567,11 @@ index 00000000..8c53892a
 +
 +All in one place with one API you get your BREs, EREs, PCREs and JREs.
 +
++In addition, if the library is built with `--enable-jit` and the platform
++allows creation of writable plus executable memory for JIT compilation, the JIT
++pattern compiler will automatically be used by `regcomp` when available no
++matter what options are passed to the `regcomp` function.
++
 +
 +Backwards Compatibility
 +-----------------------
@@ -2666,16 +2681,46 @@ index 00000000..8c53892a
 +bail out immediately if it gets a `REG_INVARG` result.
 +
 +
++What's this JIT?
++----------------
++
++The PCRE library has the ability (if built with `--enable-jit`) to compile
++pattern matching patterns directly into machine code on some platforms.  This
++"Just In Time" pattern compilation requires:
++
++ 1. The PCRE library must be built with the `--enable-jit` configuration option
++ 2. The platform must permit creation of `PROT_WRITE | PROT_EXEC` memory
++ 3. The specific pattern and options must be supported by the JIT compiler
++ 4. Extra JIT API calls must be used
++
++The `regcomp` and `regexec` implementations included in this repository
++automatically take care of 2-4 with automatic, silent fallback to non-JIT when
++JIT is not supported for whatever reason (including disallowed write + exec).
++
++Simply add the `--enable-jit` option when running `./configure` and the
++pcreposix library will automatically use JIT pattern matching when available.
++
++If the platform in question simply does not allow JIT at all (see [here][1] and
++[here][2] for some discussion about this), it's more efficient to just build
++the library with the default `--disable-jit` configuration option.
++
++[1]: <https://bugs.exim.org/show_bug.cgi?id=1749>
++[2]: <https://bugzilla.redhat.com/show_bug.cgi?id=1290432>
++
++
 +How to Use
 +----------
 +
 +Build and install like normal for PCRE (e.g. run "./configure" then "make"
 +and then "make install").
 +
++Remember to run "./configure" with `--enable-jit` if you want the JIT pattern
++compiler support to be present (see the previous section).
++
 +This repository already contains the necessary pre-generated "configure" and
-+patches pre-applied to the PCRE 8.41 tarball release.  Clone it, download a
++patches pre-applied to the PCRE 8.42 tarball release.  Clone it, download a
 +tarball of it or see the "pcreposix-compat-patches" branch for individual
-+patches to apply to a PCRE 8.41 tarball yourself.
++patches to apply to a PCRE 8.42 tarball yourself.
 +
 +Clients that explicitly need to use non-POSIX options should include the header
 +as `#include <pcreposix/pcreposix.h>` and make sure they set the `REG_PCRE`
@@ -2692,11 +2737,12 @@ index 00000000..8c53892a
 +accompanying "README-GIT-REGEX" and "config.mak" files for assistance with
 +doing that.
 +
-+See the previous section for a discussion of what happens when you link against
-+the new "pcreposix" library and an older "pcre" library.  In some cases that
-+may be a desirable scenario where a static version of the new "pcreposix"
-+library is linked into an application which is then linked against an older
-+shared "pcre" library.  Read the previous section for details.
++See the "New pcreposix Old pcre" section above for a discussion of what happens
++when you link against the new "pcreposix" library and an older "pcre" library.
++In some cases that may be a desirable scenario where a static version of the
++new "pcreposix" library is linked into an application which is then linked
++against an older shared "pcre" library.  Read the "New pcreposix Old pcre"
++section for full details.
 +
 +
 +License
@@ -2712,7 +2758,7 @@ index 00000000..8c53892a
 +https://github.com/mackyle/pcreposix-compat
 diff --git a/config.mak b/config.mak
 new file mode 100644
-index 00000000..87991d04
+index 00000000..8d69bc96
 --- /dev/null
 +++ b/config.mak
 @@ -0,0 +1,73 @@
@@ -2741,6 +2787,29 @@ index 00000000..87991d04
 +# in the top-level directory of the Git distribution (alongside "Makefile")
 +# that is being built.
 +
++# Unfortunately Git's bundled compatibility regex library suffers from some
++# serious performance problems.  Despite that it's often used automatically.
++
++# Have Git build with pcreposix-compat instead which does not suffer from
++# the same problematic performance problems.
++
++# Set PCREPOSIXDIR to the directory containing an "include" and "lib"
++# subdirectory with -lpcreposix -lpcre in "lib" and "pcreposix/regex.h" in
++# "include".
++
++PCREPOSIXDIR = /usr/local/or/whatever/correct/location/is/needed
++
++# Alternatively change both of these two instead
++PCREPOSIXINC = $(PCREPOSIXDIR)/include/pcreposix # should be a regex.h in here
++PCREPOSIXLIB = $(PCREPOSIXDIR)/lib # should be a libpcreposix.<ext> in here
++
++# Turn off the bundled regex (ineffective if uname_S is "Darwin")
++NO_REGEX =
++
++# Add pcreposix-compat compiler and linker options
++BASIC_CFLAGS += -I$(PCREPOSIXINC)
++EXTLIBS += -L$(PCREPOSIXLIB) -lpcreposix -lpcre
++
 +# The Git Makefile hard-codes NO_REGEX when uname_S is Darwin.
 +# Compensate for that by altering the uname_S setting in that case
 +# and duplicating the needed non-regex logic.
@@ -2766,29 +2835,6 @@ index 00000000..87991d04
 +  endif
 +  PTHREAD_LIBS =
 +endif
-+
-+# Unfortunately Git's bundled compatibility regex library suffers from some
-+# serious performance problems.  Despite that it's often used automatically.
-+
-+# Have Git build with pcreposix-compat instead which does not suffer from
-+# the same problematic performance problems.
-+
-+# Set PCREPOSIXDIR to the directory containing an "include" and "lib"
-+# subdirectory with -lpcreposix -lpcre in "lib" and "pcreposix/regex.h" in
-+# "include".
-+
-+PCREPOSIXDIR = /usr/local/or/whatever/correct/location/is/needed
-+
-+# Alternatively change both of these two instead
-+PCREPOSIXINC = $(PCREPOSIXDIR)/include/pcreposix # should be a regex.h in here
-+PCREPOSIXLIB = $(PCREPOSIXDIR)/lib # should be a libpcreposix.<ext> in here
-+
-+# Turn off the bundled regex (ineffective if uname_S is still "Darwin")
-+NO_REGEX =
-+
-+# Add pcreposix-compat compiler and linker options
-+BASIC_CFLAGS += -I$(PCREPOSIXINC)
-+EXTLIBS += -L$(PCREPOSIXLIB) -lpcreposix -lpcre
 diff --git a/doc/html/pcreposix.html b/doc/html/pcreposix.html
 index 2cfce6d9..8fa415cd 100644
 --- a/doc/html/pcreposix.html
@@ -2866,4 +2912,4 @@ index 00000000..bdb9297f
 +---
 
 -- 
-tg: (076e1bd7..) t/compat-readme (depends on: t/compat-version)
+tg: (29ae2a58..) t/compat-readme (depends on: t/compat-version)
