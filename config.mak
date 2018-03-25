@@ -23,6 +23,29 @@
 # in the top-level directory of the Git distribution (alongside "Makefile")
 # that is being built.
 
+# Unfortunately Git's bundled compatibility regex library suffers from some
+# serious performance problems.  Despite that it's often used automatically.
+
+# Have Git build with pcreposix-compat instead which does not suffer from
+# the same problematic performance problems.
+
+# Set PCREPOSIXDIR to the directory containing an "include" and "lib"
+# subdirectory with -lpcreposix -lpcre in "lib" and "pcreposix/regex.h" in
+# "include".
+
+PCREPOSIXDIR = /usr/local/or/whatever/correct/location/is/needed
+
+# Alternatively change both of these two instead
+PCREPOSIXINC = $(PCREPOSIXDIR)/include/pcreposix # should be a regex.h in here
+PCREPOSIXLIB = $(PCREPOSIXDIR)/lib # should be a libpcreposix.<ext> in here
+
+# Turn off the bundled regex (ineffective if uname_S is "Darwin")
+NO_REGEX =
+
+# Add pcreposix-compat compiler and linker options
+BASIC_CFLAGS += -I$(PCREPOSIXINC)
+EXTLIBS += -L$(PCREPOSIXLIB) -lpcreposix -lpcre
+
 # The Git Makefile hard-codes NO_REGEX when uname_S is Darwin.
 # Compensate for that by altering the uname_S setting in that case
 # and duplicating the needed non-regex logic.
@@ -48,26 +71,3 @@ ifeq ($(uname_S),Darwin)
   endif
   PTHREAD_LIBS =
 endif
-
-# Unfortunately Git's bundled compatibility regex library suffers from some
-# serious performance problems.  Despite that it's often used automatically.
-
-# Have Git build with pcreposix-compat instead which does not suffer from
-# the same problematic performance problems.
-
-# Set PCREPOSIXDIR to the directory containing an "include" and "lib"
-# subdirectory with -lpcreposix -lpcre in "lib" and "pcreposix/regex.h" in
-# "include".
-
-PCREPOSIXDIR = /usr/local/or/whatever/correct/location/is/needed
-
-# Alternatively change both of these two instead
-PCREPOSIXINC = $(PCREPOSIXDIR)/include/pcreposix # should be a regex.h in here
-PCREPOSIXLIB = $(PCREPOSIXDIR)/lib # should be a libpcreposix.<ext> in here
-
-# Turn off the bundled regex (ineffective if uname_S is still "Darwin")
-NO_REGEX =
-
-# Add pcreposix-compat compiler and linker options
-BASIC_CFLAGS += -I$(PCREPOSIXINC)
-EXTLIBS += -L$(PCREPOSIXLIB) -lpcreposix -lpcre

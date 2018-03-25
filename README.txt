@@ -8,6 +8,14 @@ POSIX compatibility updates for the "pcreposix" functionality provided with
 the PCRE library so that "pcreposix.h" and the corresponding library may be
 used as a standard POSIX "regex.h" substitute.
 
+In addition `pcre_jit_exec` stubs are included when building with
+`--disable-jit` and when building with `--enable-jit` `pcre_jit_exec` will
+automatically fall back to `pcre_exec` when no JIT compilation is available.
+This makes the library work more seamlessly whether in JIT mode or not (perhaps
+because JIT cannot handle the specific pattern or because the platform in
+question does not allow creation of writable plus executable memory for the JIT
+compilation) even when callers are not using the JIT API entirely correctly.
+
 See the "How to Use" section at the bottom if you're having a tl;dr moment.
 
 
@@ -334,6 +342,11 @@ Javascript Regular Expression (JRE) support.
 
 All in one place with one API you get your BREs, EREs, PCREs and JREs.
 
+In addition, if the library is built with `--enable-jit` and the platform
+allows creation of writable plus executable memory for JIT compilation, the JIT
+pattern compiler will automatically be used by `regcomp` when available no
+matter what options are passed to the `regcomp` function.
+
 
 Backwards Compatibility
 -----------------------
@@ -443,11 +456,41 @@ attempt to compile a simple pattern using the needed options at startup and
 bail out immediately if it gets a `REG_INVARG` result.
 
 
+What's this JIT?
+----------------
+
+The PCRE library has the ability (if built with `--enable-jit`) to compile
+pattern matching patterns directly into machine code on some platforms.  This
+"Just In Time" pattern compilation requires:
+
+ 1. The PCRE library must be built with the `--enable-jit` configuration option
+ 2. The platform must permit creation of `PROT_WRITE | PROT_EXEC` memory
+ 3. The specific pattern and options must be supported by the JIT compiler
+ 4. Extra JIT API calls must be used
+
+The `regcomp` and `regexec` implementations included in this repository
+automatically take care of 2-4 with automatic, silent fallback to non-JIT when
+JIT is not supported for whatever reason (including disallowed write + exec).
+
+Simply add the `--enable-jit` option when running `./configure` and the
+pcreposix library will automatically use JIT pattern matching when available.
+
+If the platform in question simply does not allow JIT at all (see [here][1] and
+[here][2] for some discussion about this), it's more efficient to just build
+the library with the default `--disable-jit` configuration option.
+
+[1]: <https://bugs.exim.org/show_bug.cgi?id=1749>
+[2]: <https://bugzilla.redhat.com/show_bug.cgi?id=1290432>
+
+
 How to Use
 ----------
 
 Build and install like normal for PCRE (e.g. run "./configure" then "make"
 and then "make install").
+
+Remember to run "./configure" with `--enable-jit` if you want the JIT pattern
+compiler support to be present (see the previous section).
 
 This repository already contains the necessary pre-generated "configure" and
 patches pre-applied to the PCRE 8.42 tarball release.  Clone it, download a
@@ -469,11 +512,12 @@ If you wish to use this as a substitute "regex.h" when building Git, see the
 accompanying "README-GIT-REGEX" and "config.mak" files for assistance with
 doing that.
 
-See the previous section for a discussion of what happens when you link against
-the new "pcreposix" library and an older "pcre" library.  In some cases that
-may be a desirable scenario where a static version of the new "pcreposix"
-library is linked into an application which is then linked against an older
-shared "pcre" library.  Read the previous section for details.
+See the "New pcreposix Old pcre" section above for a discussion of what happens
+when you link against the new "pcreposix" library and an older "pcre" library.
+In some cases that may be a desirable scenario where a static version of the
+new "pcreposix" library is linked into an application which is then linked
+against an older shared "pcre" library.  Read the "New pcreposix Old pcre"
+section for full details.
 
 
 License

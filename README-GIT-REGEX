@@ -84,9 +84,9 @@ the `config.mak.uname` file for the `Darwin` platform only, additional
 contortions are required to get a Git build on `Darwin` to use the new
 "pcreposix" library in place of the bundled regex library.
 
-Add the contents of the contents of the `config.mak` file in this repository
-to the end of your own (creating it if you don't have one already) in the
-top-level of the Git distribution you wish to build.
+Add the contents of the `config.mak` file in this repository to the end of your
+ own (creating it if you don't have one already) in the top-level of the Git
+ distribution you wish to build.
 
 Adjust the `PCREPOSIXDIR` and optionally `PCREPOSIXINC` and/or `PCREPOSIXLIB`
 settings as required to reflect the location of new pcreposix and pcre
@@ -99,4 +99,6 @@ failures.  There is a patch in the `gitpatches` subdirectory that can be
 applied to v2.11.1 to eliminate the spurious failure when using the
 pcreposix-compat library as a regex.h substitute.  Git versions prior to
 v2.11.1 will experience more spurious test failures from the t7810-grep test
-which can also safely be ignored.
+which can also safely be ignored.  Current versions of the Git test suite code
+as of 2018-03 (approx. Git version 2.16.3) continue to rely on the same
+POSIX-undefined behavior in the t7810 test that's dealt with by the patch.
