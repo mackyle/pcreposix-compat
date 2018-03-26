@@ -559,21 +559,8 @@ else
 
 len = (int)(eo - so);
 if ((size_t)len != (eo - so)) return REG_INVARG;
-if (re_pcre_extra != NULL)
-  {
-  pcre_jit_stack *jit_stack = pcre_jit_stack_alloc(4096, 65536);
-  if (jit_stack != NULL)
-    {
-    rc = pcre_jit_exec(re_pcre, re_pcre_extra, string + so, len,
-      0, options, ovector, (int)(nmatch * 3), jit_stack);
-    pcre_jit_stack_free(jit_stack);
-    }
-  else
-    rc = PCRE_ERROR_NOMEMORY;
-  }
-else
-  rc = pcre_exec(re_pcre, NULL, string + so, len,
-    0, options, ovector, (int)(nmatch * 3));
+rc = pcre_exec(re_pcre, re_pcre_extra, string + so, len,
+  0, options, ovector, (int)(nmatch * 3));
 
 if (rc == 0) rc = (int)nmatch;    /* All captured slots were filled in */
 
