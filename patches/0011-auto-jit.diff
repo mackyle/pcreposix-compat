@@ -13,13 +13,13 @@ to JIT compile the pattern when supported.
 Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
 
 ---
- pcreposix.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ pcreposix.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
  pcreposix.h |   2 +-
- pcretest.c  |   7 ++--
- 3 files changed, 111 insertions(+), 13 deletions(-)
+ pcretest.c  |   7 +++--
+ 3 files changed, 97 insertions(+), 12 deletions(-)
 
 diff --git a/pcreposix.c b/pcreposix.c
-index 2d99715c..52751d5f 100644
+index 2d99715c..ce6877f1 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -212,6 +212,17 @@ static const char *const pstring[] = {
@@ -173,30 +173,15 @@ index 2d99715c..52751d5f 100644
  
  if ((eflags & REG_NOTBOL) != 0) options |= PCRE_NOTBOL;
  if ((eflags & REG_NOTEOL) != 0) options |= PCRE_NOTEOL;
-@@ -475,8 +559,21 @@ else
+@@ -475,7 +559,7 @@ else
  
  len = (int)(eo - so);
  if ((size_t)len != (eo - so)) return REG_INVARG;
 -rc = pcre_exec((const pcre *)preg->re_pcre, NULL, string + so, len,
--  0, options, ovector, (int)(nmatch * 3));
-+if (re_pcre_extra != NULL)
-+  {
-+  pcre_jit_stack *jit_stack = pcre_jit_stack_alloc(4096, 65536);
-+  if (jit_stack != NULL)
-+    {
-+    rc = pcre_jit_exec(re_pcre, re_pcre_extra, string + so, len,
-+      0, options, ovector, (int)(nmatch * 3), jit_stack);
-+    pcre_jit_stack_free(jit_stack);
-+    }
-+  else
-+    rc = PCRE_ERROR_NOMEMORY;
-+  }
-+else
-+  rc = pcre_exec(re_pcre, NULL, string + so, len,
-+    0, options, ovector, (int)(nmatch * 3));
++rc = pcre_exec(re_pcre, re_pcre_extra, string + so, len,
+   0, options, ovector, (int)(nmatch * 3));
  
  if (rc == 0) rc = (int)nmatch;    /* All captured slots were filled in */
- 
 diff --git a/pcreposix.h b/pcreposix.h
 index 11a5c9f6..27b89653 100644
 --- a/pcreposix.h

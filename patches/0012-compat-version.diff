@@ -393,4 +393,4 @@ index 78ed0729..a19235e9 100644
  .B int regcomp(regex_t *\fIpreg\fP, const char *\fIpattern\fP,
 
 -- 
-tg: (9aa8048e..) t/compat-version (depends on: t/auto-jit)
+tg: (30900add..) t/compat-version (depends on: t/auto-jit)
