@@ -17,12 +17,12 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  README-GIT-REGEX                                   |  104 ++
  README-PCRE                                        | 1002 ++++++++++++++++++++
  README.md                                          |    1 +
- README.txt                                         |  533 +++++++++++
+ README.txt                                         |  542 +++++++++++
  config.mak                                         |   73 ++
  doc/html/pcreposix.html                            |    6 +
  doc/pcreposix.3                                    |    5 +
  .../7810-spurious-undefined-behavior-fail-fix.txt  |   36 +
- 12 files changed, 1773 insertions(+), 1005 deletions(-)
+ 12 files changed, 1782 insertions(+), 1005 deletions(-)
  create mode 100644 .gitattributes
  delete mode 100644 README
  create mode 100644 README-GIT-REGEX
@@ -58,10 +58,10 @@ index 9d11b076..bb56b4e8 100644
  # Note that pcrecpp.html is not in this list; it is listed separately below.
  
 diff --git a/Makefile.in b/Makefile.in
-index 1d1ac319..b7f919e0 100644
+index d4b003e5..fd1d9401 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -733,7 +733,8 @@ am__DIST_COMMON = $(dist_man_MANS) $(srcdir)/Makefile.in \
+@@ -815,7 +815,8 @@ am__DIST_COMMON = $(dist_man_MANS) $(srcdir)/Makefile.in \
  	$(srcdir)/libpcrecpp.pc.in $(srcdir)/libpcreposix.pc.in \
  	$(srcdir)/pcre-config.in $(srcdir)/pcre.h.in \
  	$(srcdir)/pcre_stringpiece.h.in $(srcdir)/pcrecpparg.h.in \
@@ -71,7 +71,7 @@ index 1d1ac319..b7f919e0 100644
  	config.guess config.sub depcomp install-sh ltmain.sh missing \
  	test-driver
  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-@@ -930,7 +931,10 @@ dist_doc_DATA = \
+@@ -1012,7 +1013,10 @@ dist_doc_DATA = \
    ChangeLog \
    LICENCE \
    NEWS \
@@ -2219,10 +2219,10 @@ index 00000000..c3ca0746
 \ No newline at end of file
 diff --git a/README.txt b/README.txt
 new file mode 100644
-index 00000000..6e060559
+index 00000000..f55c57c4
 --- /dev/null
 +++ b/README.txt
-@@ -0,0 +1,533 @@
+@@ -0,0 +1,542 @@
 +PCRE POSIX Compat
 +=================
 +
@@ -2704,6 +2704,15 @@ index 00000000..6e060559
 +[here][2] for some discussion about this), it's more efficient to just build
 +the library with the default `--disable-jit` configuration option.
 +
++If building for Mac OS X against an older version of the Mac OS X SDK with
++`--enable-jit` and the intent is to potentially use the resulting code on newer
++versions of OS X, the following defines should be added at configure time:
++
++    CPPFLAGS="-DTARGET_OS_OSX=1 -DMAP_JIT=0x0800" ./configure --enable-jit ...
++
++Newer SDKs would provide those exact values and the PCRE JIT runtime is smart
++enough to only use `MAP_JIT` when the OS version it's running on supports it.
++
 +[1]: <https://bugs.exim.org/show_bug.cgi?id=1749>
 +[2]: <https://bugzilla.redhat.com/show_bug.cgi?id=1290432>
 +
@@ -2718,9 +2727,9 @@ index 00000000..6e060559
 +compiler support to be present (see the previous section).
 +
 +This repository already contains the necessary pre-generated "configure" and
-+patches pre-applied to the PCRE 8.42 tarball release.  Clone it, download a
++patches pre-applied to the PCRE 8.43 tarball release.  Clone it, download a
 +tarball of it or see the "pcreposix-compat-patches" branch for individual
-+patches to apply to a PCRE 8.42 tarball yourself.
++patches to apply to a PCRE 8.43 tarball yourself.
 +
 +Clients that explicitly need to use non-POSIX options should include the header
 +as `#include <pcreposix/pcreposix.h>` and make sure they set the `REG_PCRE`
@@ -2912,4 +2921,4 @@ index 00000000..bdb9297f
 +---
 
 -- 
-tg: (6d44d84f..) t/compat-readme (depends on: t/compat-version)
+tg: (2915f80d..) t/compat-readme (depends on: t/compat-version)

@@ -49,10 +49,10 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  2 files changed, 25 insertions(+), 1 deletion(-)
 
 diff --git a/pcre_compile.c b/pcre_compile.c
-index 6dd88860..e5af9d1c 100644
+index 079d30aa..83595d54 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
-@@ -9063,6 +9063,7 @@ pcre_uint32 firstchar, reqchar;
+@@ -9073,6 +9073,7 @@ pcre_uint32 firstchar, reqchar;
  pcre_uint32 limit_match = PCRE_UINT32_MAX;
  pcre_uint32 limit_recursion = PCRE_UINT32_MAX;
  int newline;
@@ -60,7 +60,7 @@ index 6dd88860..e5af9d1c 100644
  int errorcode = 0;
  int skipatstart = 0;
  BOOL utf;
-@@ -9125,12 +9126,21 @@ cd->ctypes = tables + ctypes_offset;
+@@ -9135,12 +9136,21 @@ cd->ctypes = tables + ctypes_offset;
  
  /* Check that all undefined public option bits are zero */
  
@@ -83,7 +83,7 @@ index 6dd88860..e5af9d1c 100644
  /* If PCRE_NEVER_UTF is set, remember it. */
  
  if ((options & PCRE_NEVER_UTF) != 0) never_utf = TRUE;
-@@ -9369,6 +9379,7 @@ cd->parens_depth = 0;
+@@ -9379,6 +9389,7 @@ cd->parens_depth = 0;
  cd->assert_depth = 0;
  cd->max_lookbehind = 0;
  cd->external_options = options;
@@ -124,4 +124,4 @@ index 97ff55d0..c04f2ff6 100644
    BOOL had_accept;                  /* (*ACCEPT) encountered */
 
 -- 
-tg: (1aadf288..) t/pcre-extended-options (depends on: t/vendor)
+tg: (4ad74dd2..) t/pcre-extended-options (depends on: t/vendor)

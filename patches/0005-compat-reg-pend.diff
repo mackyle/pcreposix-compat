@@ -71,7 +71,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  6 files changed, 164 insertions(+), 10 deletions(-)
 
 diff --git a/pcre.h.generic b/pcre.h.generic
-index 808eb4f1..ce71b928 100644
+index c9d7f452..81fd8c13 100644
 --- a/pcre.h.generic
 +++ b/pcre.h.generic
 @@ -172,6 +172,7 @@ with J. */
@@ -95,7 +95,7 @@ index c7b10a75..37245f8b 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre_compile.c b/pcre_compile.c
-index 1815c0f3..c39b4278 100644
+index 07c42499..ed2aab3d 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -285,6 +285,12 @@ static const pcre_uchar sub_implicit_rsb_newline[] = {
@@ -198,7 +198,7 @@ index 1815c0f3..c39b4278 100644
            {
            if (IS_NEWLINE(p))         /* For non-fixed-length newline cases, */
              {                        /* IS_NEWLINE sets cd->nllen. */
-@@ -7821,6 +7848,8 @@ for (;; ptr++)
+@@ -7823,6 +7850,8 @@ for (;; ptr++)
      tempbracount = cd->bracount;          /* Save value before bracket */
      length_prevgroup = 0;                 /* Initialize for pre-compile phase */
  
@@ -207,7 +207,7 @@ index 1815c0f3..c39b4278 100644
      if (!compile_regex(
           newoptions,                      /* The complete new option state */
           &tempcode,                       /* Where to put code (updated) */
-@@ -7842,6 +7871,8 @@ for (;; ptr++)
+@@ -7844,6 +7873,8 @@ for (;; ptr++)
             &length_prevgroup              /* Pre-compile phase */
           ))
        goto FAILED;
@@ -216,7 +216,7 @@ index 1815c0f3..c39b4278 100644
  
      cd->parens_depth -= 1;
  
-@@ -9131,6 +9162,7 @@ size_t size;
+@@ -9141,6 +9172,7 @@ size_t size;
  pcre_uchar *code;
  const pcre_uchar *codestart;
  const pcre_uchar *ptr;
@@ -224,7 +224,7 @@ index 1815c0f3..c39b4278 100644
  compile_data compile_block;
  compile_data *cd = &compile_block;
  
-@@ -9191,6 +9223,7 @@ if ((options & ~(PUBLIC_COMPILE_OPTIONS | PUBLIC_EXTENDED_COMPILE_OPTIONS)) != 0
+@@ -9201,6 +9233,7 @@ if ((options & ~(PUBLIC_COMPILE_OPTIONS | PUBLIC_EXTENDED_COMPILE_OPTIONS)) != 0
      (((options & PCRE_XC1OPTIONS) == 0) &&
       (options & (PUBLIC_EXTENDED_COMPILE_OPTIONS & ~PCRE_XC1OPTIONS)) != 0))
    {
@@ -232,7 +232,7 @@ index 1815c0f3..c39b4278 100644
    errorcode = ERR17;
    goto PCRE_EARLY_ERROR_RETURN;
    }
-@@ -9200,6 +9233,54 @@ if ((options & ~(PUBLIC_COMPILE_OPTIONS | PUBLIC_EXTENDED_COMPILE_OPTIONS)) != 0
+@@ -9210,6 +9243,54 @@ if ((options & ~(PUBLIC_COMPILE_OPTIONS | PUBLIC_EXTENDED_COMPILE_OPTIONS)) != 0
  options2 = options & (PUBLIC_EXTENDED_COMPILE_OPTIONS & ~PCRE_XC1OPTIONS);
  options &= ~PUBLIC_EXTENDED_COMPILE_OPTIONS;
  
@@ -287,7 +287,7 @@ index 1815c0f3..c39b4278 100644
  /* If PCRE_NEVER_UTF is set, remember it. */
  
  if ((options & PCRE_NEVER_UTF) != 0) never_utf = TRUE;
-@@ -9433,7 +9514,10 @@ cd->workspace_size = COMPILE_WORK_SIZE;
+@@ -9443,7 +9524,10 @@ cd->workspace_size = COMPILE_WORK_SIZE;
  cd->named_groups = named_groups;
  cd->named_group_list_size = NAMED_GROUP_LIST_SIZE;
  cd->start_pattern = (const pcre_uchar *)pattern;
@@ -440,4 +440,4 @@ index 853d3326..248f7977 100644
  /* The structure in which a captured offset is returned. */
 
 -- 
-tg: (e3b3a67f..) t/compat-reg-pend (depends on: t/compat-reg-nospec)
+tg: (b3ed2449..) t/compat-reg-pend (depends on: t/compat-reg-nospec)

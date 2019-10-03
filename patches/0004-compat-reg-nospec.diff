@@ -37,7 +37,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  9 files changed, 38 insertions(+), 6 deletions(-)
 
 diff --git a/pcre.h.generic b/pcre.h.generic
-index 520973c2..808eb4f1 100644
+index 77dd1725..c9d7f452 100644
 --- a/pcre.h.generic
 +++ b/pcre.h.generic
 @@ -171,6 +171,7 @@ with J. */
@@ -61,7 +61,7 @@ index 3559f436..c7b10a75 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre_compile.c b/pcre_compile.c
-index 99d57378..1815c0f3 100644
+index e90f6ba7..07c42499 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -4488,7 +4488,7 @@ register pcre_uchar *code = *codeptr;
@@ -83,7 +83,7 @@ index 99d57378..1815c0f3 100644
        {
        inescq = FALSE;
        ptr++;
-@@ -9210,7 +9211,7 @@ cd->external_flags = 0;   /* Initialize here for LIMIT_MATCH/RECURSION */
+@@ -9220,7 +9221,7 @@ cd->external_flags = 0;   /* Initialize here for LIMIT_MATCH/RECURSION */
  
  while (ptr[skipatstart] == CHAR_LEFT_PARENTHESIS &&
         ptr[skipatstart+1] == CHAR_ASTERISK &&
@@ -197,4 +197,4 @@ index 85a538ad..f57de3c1 100644
      aXb
 
 -- 
-tg: (94e6200b..) t/compat-reg-nospec (depends on: t/posix-reg-basic)
+tg: (be1d58bd..) t/compat-reg-nospec (depends on: t/posix-reg-basic)

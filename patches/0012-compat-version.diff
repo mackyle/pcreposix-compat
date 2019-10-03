@@ -16,14 +16,14 @@ co-exist with the old location and old header.
 Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
 
 ---
- CMakeLists.txt          |   9 +++-
- Makefile.am             |  11 ++++-
- Makefile.in             | 126 +++++++++++++++++++++++++++++++++++++-----------
+ CMakeLists.txt          |   9 ++++-
+ Makefile.am             |  11 +++++-
+ Makefile.in             | 103 +++++++++++++++++++++++++++++++++++++++---------
  configure               |   2 +-
  configure.ac            |   2 +-
  doc/html/pcreposix.html |   2 +-
  doc/pcreposix.3         |   2 +-
- 7 files changed, 117 insertions(+), 37 deletions(-)
+ 7 files changed, 105 insertions(+), 26 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 858a34bd..213d5393 100644
@@ -90,30 +90,31 @@ index 22b69471..9d11b076 100644
  # These additional headers will be be installed if C++ support is enabled. We
  # do not distribute pcrecpparg.h or pcre_stringpiece.h, as these are generated
 diff --git a/Makefile.in b/Makefile.in
-index 156cb77f..1d1ac319 100644
+index dd9df7f6..d4b003e5 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -172,7 +172,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
+@@ -172,7 +172,9 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
  DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
  	$(am__configure_deps) $(am__dist_noinst_SCRIPTS_DIST) \
  	$(dist_doc_DATA) $(dist_html_DATA) $(dist_noinst_DATA) \
 -	$(am__include_HEADERS_DIST) $(am__DIST_COMMON)
 +	$(am__include_HEADERS_DIST) $(otherinclude_HEADERS) \
 +	$(am__DIST_COMMON)
++
  am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
   configure.lineno config.status.lineno
  mkinstalldirs = $(install_sh) -d
-@@ -213,7 +214,8 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
+@@ -187,7 +189,8 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)" \
  	"$(DESTDIR)$(man3dir)" "$(DESTDIR)$(docdir)" \
  	"$(DESTDIR)$(htmldir)" "$(DESTDIR)$(htmldir)" \
  	"$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" \
 -	"$(DESTDIR)$(includedir)"
 +	"$(DESTDIR)$(includedir)" "$(DESTDIR)$(otherincludedir)" \
 +	"$(DESTDIR)$(otherincludedir)"
- LTLIBRARIES = $(lib_LTLIBRARIES)
- libpcre_la_DEPENDENCIES =
- am__libpcre_la_SOURCES_DIST = pcre_byte_order.c pcre_compile.c \
-@@ -524,8 +526,9 @@ NROFF = nroff
+ @WITH_REBUILD_CHARTABLES_TRUE@am__EXEEXT_2 = dftables$(EXEEXT)
+ @WITH_JIT_TRUE@am__EXEEXT_3 = pcre_jit_test$(EXEEXT)
+ @WITH_PCRE_CPP_TRUE@am__EXEEXT_4 = pcrecpp_unittest$(EXEEXT) \
+@@ -605,8 +608,9 @@ NROFF = nroff
  MANS = $(dist_man_MANS) $(man_MANS)
  DATA = $(dist_doc_DATA) $(dist_html_DATA) $(dist_noinst_DATA) \
  	$(html_DATA) $(pkgconfig_DATA)
@@ -125,7 +126,7 @@ index 156cb77f..1d1ac319 100644
  am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
  	$(LISP)config.h.in
  # Read a list of newline-separated strings from the standard input,
-@@ -810,6 +813,11 @@ LIPO = @LIPO@
+@@ -891,6 +895,11 @@ LIPO = @LIPO@
  LN_S = @LN_S@
  LTLIBOBJS = @LTLIBOBJS@
  LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
@@ -137,7 +138,7 @@ index 156cb77f..1d1ac319 100644
  MAKEINFO = @MAKEINFO@
  MANIFEST_TOOL = @MANIFEST_TOOL@
  MKDIR_P = @MKDIR_P@
-@@ -992,8 +1000,9 @@ check_SCRIPTS =
+@@ -1073,8 +1082,9 @@ check_SCRIPTS =
  dist_noinst_SCRIPTS = RunTest $(am__append_39)
  
  # Additional files to delete on 'make clean' and 'make maintainer-clean'.
@@ -149,23 +150,19 @@ index 156cb77f..1d1ac319 100644
  MAINTAINERCLEANFILES = pcre.h.generic config.h.generic
  
  # Additional files to bundle with the distribution, over and above what
-@@ -1080,7 +1089,14 @@ EXTRA_DIST = m4/ax_pthread.m4 m4/pcre_visibility.m4 doc/perltest.txt \
+@@ -1161,7 +1171,10 @@ EXTRA_DIST = m4/ax_pthread.m4 m4/pcre_visibility.m4 doc/perltest.txt \
  # These are the header files we'll install. We do not distribute pcre.h because
  # it is generated from pcre.h.in.
  nodist_include_HEADERS = pcre.h $(am__append_1)
 -include_HEADERS = pcreposix.h $(am__append_2)
 +include_HEADERS = $(am__append_2)
 +otherincludedir = $(includedir)/pcreposix
-+otherinclude_HEADERS = \
-+  pcreposix.h
-+
-+nodist_otherinclude_HEADERS = \
-+  regex.h
-+
++otherinclude_HEADERS = pcreposix.h
++nodist_otherinclude_HEADERS = regex.h
  bin_SCRIPTS = pcre-config
  @WITH_REBUILD_CHARTABLES_TRUE@dftables_SOURCES = dftables.c
  BUILT_SOURCES = pcre_chartables.c
-@@ -1325,7 +1341,7 @@ all: $(BUILT_SOURCES) config.h
+@@ -1406,7 +1419,7 @@ all: $(BUILT_SOURCES) config.h
  .SUFFIXES: .c .cc .lo .log .o .obj .test .test$(EXEEXT) .trs
  am--refresh: Makefile
  	@:
@@ -174,7 +171,7 @@ index 156cb77f..1d1ac319 100644
  	@for dep in $?; do \
  	  case '$(am__configure_deps)' in \
  	    *$$dep*) \
-@@ -1351,11 +1367,11 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+@@ -1432,11 +1445,11 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
  $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
  	$(SHELL) ./config.status --recheck
  
@@ -189,35 +186,19 @@ index 156cb77f..1d1ac319 100644
  
  config.h: stamp-h1
  	@test -f $@ || rm -f stamp-h1
-@@ -1364,7 +1380,7 @@ config.h: stamp-h1
+@@ -1445,7 +1458,7 @@ config.h: stamp-h1
  stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
  	@rm -f stamp-h1
  	cd $(top_builddir) && $(SHELL) ./config.status config.h
--$(srcdir)/config.h.in:  $(am__configure_deps) 
-+$(MM)$(srcdir)/config.h.in:  $(am__configure_deps) 
+-$(srcdir)/config.h.in:  $(am__configure_deps)
++$(MM)$(srcdir)/config.h.in:  $(am__configure_deps)
  	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
  	rm -f stamp-h1
  	touch $@
-@@ -2534,6 +2550,48 @@ uninstall-nodist_includeHEADERS:
- 	@list='$(nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
- 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
- 	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
-+install-nodist_otherincludeHEADERS: $(nodist_otherinclude_HEADERS)
-+	@$(NORMAL_INSTALL)
-+	@list='$(nodist_otherinclude_HEADERS)'; test -n "$(otherincludedir)" || list=; \
-+	if test -n "$$list"; then \
-+	  echo " $(MKDIR_P) '$(DESTDIR)$(otherincludedir)'"; \
-+	  $(MKDIR_P) "$(DESTDIR)$(otherincludedir)" || exit 1; \
-+	fi; \
-+	for p in $$list; do \
-+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-+	  echo "$$d$$p"; \
-+	done | $(am__base_list) | \
-+	while read files; do \
-+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(otherincludedir)'"; \
-+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(otherincludedir)" || exit $$?; \
-+	done
-+
+@@ -2616,12 +2629,55 @@ install-nodist_includeHEADERS: $(nodist_include_HEADERS)
+ 	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(includedir)" || exit $$?; \
+ 	done
+ 
 +uninstall-nodist_otherincludeHEADERS:
 +	@$(NORMAL_UNINSTALL)
 +	@list='$(nodist_otherinclude_HEADERS)'; test -n "$(otherincludedir)" || list=; \
@@ -244,19 +225,42 @@ index 156cb77f..1d1ac319 100644
 +	@list='$(otherinclude_HEADERS)'; test -n "$(otherincludedir)" || list=; \
 +	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 +	dir='$(DESTDIR)$(otherincludedir)'; $(am__uninstall_files_from_dir)
++
+ uninstall-nodist_includeHEADERS:
+ 	@$(NORMAL_UNINSTALL)
+ 	@list='$(nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
+ 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+ 	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
  
++install-nodist_otherincludeHEADERS: $(nodist_otherinclude_HEADERS)
++	@$(NORMAL_INSTALL)
++	@list='$(nodist_otherinclude_HEADERS)'; test -n "$(otherincludedir)" || list=; \
++	if test -n "$$list"; then \
++	  echo " $(MKDIR_P) '$(DESTDIR)$(otherincludedir)'"; \
++	  $(MKDIR_P) "$(DESTDIR)$(otherincludedir)" || exit 1; \
++	fi; \
++	for p in $$list; do \
++	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
++	  echo "$$d$$p"; \
++	done | $(am__base_list) | \
++	while read files; do \
++	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(otherincludedir)'"; \
++	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(otherincludedir)" || exit $$?; \
++	done
++
  ID: $(am__tagged_files)
  	$(am__define_uniq_tagged_files); mkid -fID $$unique
-@@ -2963,7 +3021,7 @@ all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS) $(MANS) $(DATA) \
+ tags: tags-am
+@@ -3053,7 +3109,7 @@ all-am: Makefile $(PROGRAMS) $(LTLIBRARIES) $(SCRIPTS) $(MANS) $(DATA) \
  install-binPROGRAMS: install-libLTLIBRARIES
  
  installdirs:
--	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(man3dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(htmldir)" "$(DESTDIR)$(htmldir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"; do \
-+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(man3dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(htmldir)" "$(DESTDIR)$(htmldir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(otherincludedir)" "$(DESTDIR)$(otherincludedir)"; do \
+-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(man3dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(htmldir)" "$(DESTDIR)$(htmldir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"; do \
++	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(man3dir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(htmldir)" "$(DESTDIR)$(htmldir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(otherincludedir)" "$(DESTDIR)$(otherincludedir)"; do \
  	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
  	done
  install: $(BUILT_SOURCES)
-@@ -3031,7 +3089,9 @@ info-am:
+@@ -3201,7 +3257,9 @@ info-am:
  
  install-data-am: install-dist_docDATA install-dist_htmlDATA \
  	install-htmlDATA install-includeHEADERS install-man \
@@ -267,51 +271,39 @@ index 156cb77f..1d1ac319 100644
  	@$(NORMAL_INSTALL)
  	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
  install-dvi: install-dvi-am
-@@ -3085,7 +3145,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
+@@ -3334,8 +3392,11 @@ ps-am:
+ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
  	uninstall-dist_docDATA uninstall-dist_htmlDATA \
  	uninstall-htmlDATA uninstall-includeHEADERS \
++	uninstall-otherincludeHEADERS \
  	uninstall-libLTLIBRARIES uninstall-man \
 -	uninstall-nodist_includeHEADERS uninstall-pkgconfigDATA
 +	uninstall-nodist_includeHEADERS \
 +	uninstall-nodist_otherincludeHEADERS \
-+	uninstall-otherincludeHEADERS uninstall-pkgconfigDATA
++	uninstall-pkgconfigDATA
  
  uninstall-man: uninstall-man1 uninstall-man3
  
-@@ -3108,25 +3170,28 @@ uninstall-man: uninstall-man1 uninstall-man3
+@@ -3358,7 +3419,9 @@ uninstall-man: uninstall-man1 uninstall-man3
  	install-html-am install-htmlDATA install-includeHEADERS \
  	install-info install-info-am install-libLTLIBRARIES \
  	install-man install-man1 install-man3 \
 -	install-nodist_includeHEADERS install-pdf install-pdf-am \
--	install-pkgconfigDATA install-ps install-ps-am install-strip \
--	installcheck installcheck-am installdirs maintainer-clean \
--	maintainer-clean-generic mostlyclean mostlyclean-compile \
--	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
--	recheck tags tags-am uninstall uninstall-am \
--	uninstall-binPROGRAMS uninstall-binSCRIPTS \
--	uninstall-dist_docDATA uninstall-dist_htmlDATA \
--	uninstall-htmlDATA uninstall-includeHEADERS \
--	uninstall-libLTLIBRARIES uninstall-man uninstall-man1 \
--	uninstall-man3 uninstall-nodist_includeHEADERS \
--	uninstall-pkgconfigDATA
 +	install-nodist_includeHEADERS \
 +	install-nodist_otherincludeHEADERS install-otherincludeHEADERS \
-+	install-pdf install-pdf-am install-pkgconfigDATA install-ps \
-+	install-ps-am install-strip installcheck installcheck-am \
-+	installdirs maintainer-clean maintainer-clean-generic \
-+	mostlyclean mostlyclean-compile mostlyclean-generic \
-+	mostlyclean-libtool pdf pdf-am ps ps-am recheck tags tags-am \
-+	uninstall uninstall-am uninstall-binPROGRAMS \
-+	uninstall-binSCRIPTS uninstall-dist_docDATA \
-+	uninstall-dist_htmlDATA uninstall-htmlDATA \
-+	uninstall-includeHEADERS uninstall-libLTLIBRARIES \
-+	uninstall-man uninstall-man1 uninstall-man3 \
-+	uninstall-nodist_includeHEADERS \
-+	uninstall-nodist_otherincludeHEADERS \
-+	uninstall-otherincludeHEADERS uninstall-pkgconfigDATA
++	install-pdf install-pdf-am \
+ 	install-pkgconfigDATA install-ps install-ps-am install-strip \
+ 	installcheck installcheck-am installdirs maintainer-clean \
+ 	maintainer-clean-generic mostlyclean mostlyclean-compile \
+@@ -3369,6 +3432,7 @@ uninstall-man: uninstall-man1 uninstall-man3
+ 	uninstall-htmlDATA uninstall-includeHEADERS \
+ 	uninstall-libLTLIBRARIES uninstall-man uninstall-man1 \
+ 	uninstall-man3 uninstall-nodist_includeHEADERS \
++	uninstall-nodist_otherincludeHEADERS uninstall-otherincludeHEADERS \
+ 	uninstall-pkgconfigDATA
  
  .PRECIOUS: Makefile
- 
+@@ -3376,7 +3440,7 @@ uninstall-man: uninstall-man1 uninstall-man3
  
  # The only difference between pcre.h.in and pcre.h is the setting of the PCRE
  # version number. Therefore, we can create the generic version just by copying.
@@ -320,7 +312,7 @@ index 156cb77f..1d1ac319 100644
  	rm -f $@
  	cp -p pcre.h $@
  
-@@ -3141,7 +3206,7 @@ pcre.h.generic: pcre.h.in configure.ac
+@@ -3391,7 +3455,7 @@ pcre.h.generic: pcre.h.in configure.ac
  # macros with values, and to #undef all boolean macros such as HAVE_xxx and
  # SUPPORT_xxx. We also get rid of any gcc-specific visibility settings. Make
  # sure that PCRE_EXP_DEFN is unset (in case it has visibility settings).
@@ -329,7 +321,7 @@ index 156cb77f..1d1ac319 100644
  	rm -rf $@ _generic
  	mkdir _generic
  	cs=$(srcdir)/config.status; test ! -f $$cs || mv -f $$cs $$cs.aside
-@@ -3160,6 +3225,9 @@ config.h.generic: configure.ac
+@@ -3410,6 +3474,9 @@ config.h.generic: configure.ac
  	  _generic/config.h >$@
  	rm -rf _generic
  
@@ -340,11 +332,11 @@ index 156cb77f..1d1ac319 100644
  @WITH_REBUILD_CHARTABLES_TRUE@	./dftables$(EXEEXT) $@
  
 diff --git a/configure b/configure
-index 0d05374f..6bca9d73 100755
+index 2db0796f..a59d4504 100755
 --- a/configure
 +++ b/configure
 @@ -19723,7 +19723,7 @@ EXTRA_LIBPCRE32_LDFLAGS="$EXTRA_LIBPCRE32_LDFLAGS \
-                        $NO_UNDEFINED -version-info 0:10:0"
+                        $NO_UNDEFINED -version-info 0:11:0"
  
  EXTRA_LIBPCREPOSIX_LDFLAGS="$EXTRA_LIBPCREPOSIX_LDFLAGS \
 -                            $NO_UNDEFINED -version-info 0:6:0"
@@ -353,13 +345,13 @@ index 0d05374f..6bca9d73 100755
  EXTRA_LIBPCRECPP_LDFLAGS="$EXTRA_LIBPCRECPP_LDFLAGS \
                            $NO_UNDEFINED -version-info 0:1:0 \
 diff --git a/configure.ac b/configure.ac
-index dcdef6a9..fed49879 100644
+index d2e5236c..d75571a5 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -20,7 +20,7 @@ m4_define(pcre_date, [2018-03-20])
- m4_define(libpcre_version, [3:10:2])
- m4_define(libpcre16_version, [2:10:2])
- m4_define(libpcre32_version, [0:10:0])
+@@ -20,7 +20,7 @@ m4_define(pcre_date, [2019-02-23])
+ m4_define(libpcre_version, [3:11:2])
+ m4_define(libpcre16_version, [2:11:2])
+ m4_define(libpcre32_version, [0:11:0])
 -m4_define(libpcreposix_version, [0:6:0])
 +m4_define(libpcreposix_version, [1:0:0])
  m4_define(libpcrecpp_version, [0:1:0])
@@ -393,4 +385,4 @@ index 78ed0729..a19235e9 100644
  .B int regcomp(regex_t *\fIpreg\fP, const char *\fIpattern\fP,
 
 -- 
-tg: (30900add..) t/compat-version (depends on: t/auto-jit)
+tg: (6f02bedf..) t/compat-version (depends on: t/auto-jit)
