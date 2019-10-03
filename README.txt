@@ -479,6 +479,15 @@ If the platform in question simply does not allow JIT at all (see [here][1] and
 [here][2] for some discussion about this), it's more efficient to just build
 the library with the default `--disable-jit` configuration option.
 
+If building for Mac OS X against an older version of the Mac OS X SDK with
+`--enable-jit` and the intent is to potentially use the resulting code on newer
+versions of OS X, the following defines should be added at configure time:
+
+    CPPFLAGS="-DTARGET_OS_OSX=1 -DMAP_JIT=0x0800" ./configure --enable-jit ...
+
+Newer SDKs would provide those exact values and the PCRE JIT runtime is smart
+enough to only use `MAP_JIT` when the OS version it's running on supports it.
+
 [1]: <https://bugs.exim.org/show_bug.cgi?id=1749>
 [2]: <https://bugzilla.redhat.com/show_bug.cgi?id=1290432>
 
@@ -493,9 +502,9 @@ Remember to run "./configure" with `--enable-jit` if you want the JIT pattern
 compiler support to be present (see the previous section).
 
 This repository already contains the necessary pre-generated "configure" and
-patches pre-applied to the PCRE 8.42 tarball release.  Clone it, download a
+patches pre-applied to the PCRE 8.43 tarball release.  Clone it, download a
 tarball of it or see the "pcreposix-compat-patches" branch for individual
-patches to apply to a PCRE 8.42 tarball yourself.
+patches to apply to a PCRE 8.43 tarball yourself.
 
 Clients that explicitly need to use non-POSIX options should include the header
 as `#include <pcreposix/pcreposix.h>` and make sure they set the `REG_PCRE`
