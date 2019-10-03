@@ -479,6 +479,15 @@ If the platform in question simply does not allow JIT at all (see [here][1] and
 [here][2] for some discussion about this), it's more efficient to just build
 the library with the default `--disable-jit` configuration option.
 
+If building for Mac OS X against an older version of the Mac OS X SDK with
+`--enable-jit` and the intent is to potentially use the resulting code on newer
+versions of OS X, the following defines should be added at configure time:
+
+    CPPFLAGS="-DTARGET_OS_OSX=1 -DMAP_JIT=0x0800" ./configure --enable-jit ...
+
+Newer SDKs would provide those exact values and the PCRE JIT runtime is smart
+enough to only use `MAP_JIT` when the OS version it's running on supports it.
+
 [1]: <https://bugs.exim.org/show_bug.cgi?id=1749>
 [2]: <https://bugzilla.redhat.com/show_bug.cgi?id=1290432>
 
