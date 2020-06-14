@@ -7,7 +7,7 @@ and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
            Copyright (c) 1997-2018 University of Cambridge
-           Copyright (C) 2017-2018 Kyle J. McKay <mackyle@gmail.com>
+           Copyright (C) 2017-2020 Kyle J. McKay <mackyle@gmail.com>
            All Rights Reserved
 
 -----------------------------------------------------------------------------
