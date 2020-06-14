@@ -57,7 +57,7 @@ and 32-bit library.
 </P>
 <P>
 The functions described here are just wrapper functions that ultimately call
-the PCRE native API. Their prototypes are defined in the <b>pcreposix.h</b>
+the PCRE native API. Their prototypes are defined in the <b>pcreposix/pcreposix.h</b>
 header file, and on Unix systems the library itself is called
 <b>pcreposix.a</b>, so can be accessed by adding <b>-lpcreposix</b> to the
 command for linking an application that uses them. Because the POSIX functions
@@ -84,7 +84,7 @@ POSIX definition; it is not fully POSIX-compatible, and in multi-byte encoding
 domains it is probably even less compatible.
 </P>
 <P>
-The header for these functions is supplied as <b>pcreposix.h</b> to avoid any
+The header for these functions is supplied as <b>pcreposix/pcreposix.h</b> to avoid any
 potential clash with other POSIX libraries. It can, of course, be renamed or
 aliased as <b>regex.h</b>, which is the "correct" name. It provides two
 structure types, <i>regex_t</i> for compiled internal forms, and

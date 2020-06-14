@@ -36,7 +36,7 @@ additional functionality. There is no POSIX-style wrapper for PCRE's 16-bit
 and 32-bit library.
 .P
 The functions described here are just wrapper functions that ultimately call
-the PCRE native API. Their prototypes are defined in the \fBpcreposix.h\fP
+the PCRE native API. Their prototypes are defined in the \fBpcreposix/pcreposix.h\fP
 header file, and on Unix systems the library itself is called
 \fBpcreposix.a\fP, so can be accessed by adding \fB-lpcreposix\fP to the
 command for linking an application that uses them. Because the POSIX functions
@@ -59,7 +59,7 @@ described below. "POSIX-like in style" means that the API approximates to the
 POSIX definition; it is not fully POSIX-compatible, and in multi-byte encoding
 domains it is probably even less compatible.
 .P
-The header for these functions is supplied as \fBpcreposix.h\fP to avoid any
+The header for these functions is supplied as \fBpcreposix/pcreposix.h\fP to avoid any
 potential clash with other POSIX libraries. It can, of course, be renamed or
 aliased as \fBregex.h\fP, which is the "correct" name. It provides two
 structure types, \fIregex_t\fP for compiled internal forms, and
