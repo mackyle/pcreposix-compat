@@ -124,7 +124,7 @@ static SLJIT_INLINE int get_map_jit_flag()
 		/* Kernel version for 10.14.0 (Mojave) */
 		if (atoi(name.release) >= 18) {
 			/* Only use MAP_JIT if a hardened runtime is used, because MAP_JIT is incompatible with fork(). */
-			void *ptr = mmap(NULL, getpagesize(), PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+			void *ptr = mmap(NULL, getpagesize(), PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANON, -1, 0);
 
 			if (ptr == MAP_FAILED) {
 				map_jit_flag = MAP_JIT;
