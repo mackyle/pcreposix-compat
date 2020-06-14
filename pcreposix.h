@@ -10,7 +10,7 @@ Compatible Regular Expression library. It defines the things POSIX says should
 be there. I hope.
 
             Copyright (C) 1997-2012 University of Cambridge
-            Copyright (C) 2017 Kyle J. McKay <mackyle@gmail.com>
+            Copyright (C) 2017-2020 Kyle J. McKay <mackyle@gmail.com>
             All Rights Reserved
 
 -----------------------------------------------------------------------------
