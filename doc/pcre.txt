@@ -9555,7 +9555,7 @@ NAME
 
 SYNOPSIS
 
-       #include <pcreposix.h>
+       #include <pcreposix/pcreposix.h>
 
        int regcomp(regex_t *preg, const char *pattern,
             int cflags);
@@ -9578,10 +9578,11 @@ DESCRIPTION
 
        The functions described here are just wrapper functions that ultimately
        call  the  PCRE  native  API.  Their  prototypes  are  defined  in  the
-       pcreposix.h  header  file,  and  on  Unix systems the library itself is
-       called pcreposix.a, so can be accessed by  adding  -lpcreposix  to  the
-       command  for  linking  an application that uses them. Because the POSIX
-       functions call the native ones, it is also necessary to add -lpcre.
+       pcreposix/pcreposix.h header file, and  on  Unix  systems  the  library
+       itself is called pcreposix.a, so can be accessed by adding  -lpcreposix
+       to the command for linking  an application that uses them.  Because the
+       POSIX functions  call the  native ones,  it is  also  necessary to  add
+       -lpcre.
 
        I have implemented only those POSIX option bits that can be  reasonably
        mapped  to PCRE native options. In addition, the option REG_EXTENDED is
@@ -9602,12 +9603,12 @@ DESCRIPTION
        POSIX-compatible, and in multi-byte encoding  domains  it  is  probably
        even less compatible.
 
-       The  header for these functions is supplied as pcreposix.h to avoid any
-       potential clash with other POSIX libraries. It can, of course,  be  re-
-       named  or  aliased as regex.h, which is the "correct" name. It provides
-       two structure types, regex_t for  compiled  internal  forms,  and  reg-
-       match_t  for  returning  captured substrings. It also defines some con-
-       stants whose names start with "REG_"; these are used  for  setting  op-
+       The  header for these functions is supplied as pcreposix/pcreposix.h to
+       avoid  any potential  clash  with  other POSIX libraries.  It  can,  of
+       course, be renamed or aliased as regex.h, which is the  "correct" name.
+       It provides two structure types, regex_t for compiled  internal  forms,
+       and regmatch_t for returning  captured substrings. It also defines some
+       constants whose names start with "REG_"; these are used for setting op-
        tions and identifying error codes.
 
 
