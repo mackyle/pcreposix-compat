@@ -1,2 +1,3 @@
 t/posix-regoff-type
 t/pcre-jit-stubs
+t/map-anon-fix
