@@ -1,0 +1,22 @@
+From: Kyle J. McKay <mackyle@gmail.com>
+Subject: [PATCH] sljit/sljitExecAllocator.c: use MAP_ANON
+
+With the PCRE-8.44 release, sljitExecAllocator.c started testing
+to see if it can successfully mmap a PROT_WRITE + PROT_EXEC block
+of memory before adding the MAP_JIT flag.
+
+Unfortunately, unlike the rest of the code, the addition uses
+MAP_ANONYMOUS for that mapping rather than MAP_ANON.
+
+The file sljitUtils.c is included before sljitExecAllocator.c and
+is very careful to make sure that if MAP_ANON is NOT defined, but
+MAP_ANONYMOUS is, then it defines MAP_ANON to be MAP_ANONYMOUS.
+
+However, it *does not* do the reverse and on MacOSX systems that
+have a MAP_ANON definition, but *not* a MAP_ANONYMOUS definition,
+that new sljitExecAllocator.c code fails to compile.
+
+Change sljitExecAllocator.c to use MAP_ANON instead of MAP_ANONYMOUS
+to correct the problem.
+
+Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
