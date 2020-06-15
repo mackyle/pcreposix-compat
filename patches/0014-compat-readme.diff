@@ -13,16 +13,17 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  .gitattributes                                     |    3 +
  Makefile.am                                        |    5 +-
  Makefile.in                                        |    8 +-
- README                                             | 1002 --------------------
+ README                                             | 1003 --------------------
  README-GIT-REGEX                                   |  104 ++
- README-PCRE                                        | 1002 ++++++++++++++++++++
+ README-PCRE                                        | 1003 ++++++++++++++++++++
  README.md                                          |    1 +
  README.txt                                         |  542 +++++++++++
  config.mak                                         |   73 ++
- doc/html/pcreposix.html                            |    6 +
- doc/pcreposix.3                                    |    5 +
+ doc/html/pcreposix.html                            |   10 +-
+ doc/pcre.txt                                       |   23 +-
+ doc/pcreposix.3                                    |    9 +-
  .../7810-spurious-undefined-behavior-fail-fix.txt  |   36 +
- 12 files changed, 1782 insertions(+), 1005 deletions(-)
+ 13 files changed, 1799 insertions(+), 1021 deletions(-)
  create mode 100644 .gitattributes
  delete mode 100644 README
  create mode 100644 README-GIT-REGEX
@@ -85,10 +86,10 @@ index d4b003e5..fd1d9401 100644
  # Note that pcrecpp.html is not in this list; it is listed separately below.
 diff --git a/README b/README
 deleted file mode 100644
-index 4887ebf3..00000000
+index 334362b3..00000000
 --- a/README
 +++ /dev/null
-@@ -1,1002 +0,0 @@
+@@ -1,1003 +0,0 @@
 -README file for PCRE (Perl-compatible regular expression library)
 ------------------------------------------------------------------
 -
@@ -104,9 +105,10 @@ index 4887ebf3..00000000
 -The latest release of PCRE1 is always available in three alternative formats
 -from:
 -
--  ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-xxx.tar.gz
--  ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-xxx.tar.bz2
--  ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-xxx.zip
+-  https://ftp.pcre.org/pub/pcre/pcre-x.xx.tar.gz
+-  https://ftp.pcre.org/pub/pcre/pcre-x.xx.tar.bz2
+-  https://ftp.pcre.org/pub/pcre/pcre-x.xx.tar.zip
+-
 -
 -There is a mailing list for discussion about the development of PCRE at
 -pcre-dev@exim.org. You can access the archives and subscribe or manage your
@@ -1090,7 +1092,7 @@ index 4887ebf3..00000000
 -Philip Hazel
 -Email local part: ph10
 -Email domain: cam.ac.uk
--Last updated: 10 February 2015
+-Last updated: 12 February 2020
 diff --git a/README-GIT-REGEX b/README-GIT-REGEX
 new file mode 100644
 index 00000000..1b0b2511
@@ -1203,10 +1205,10 @@ index 00000000..1b0b2511
 +POSIX-undefined behavior in the t7810 test that's dealt with by the patch.
 diff --git a/README-PCRE b/README-PCRE
 new file mode 100644
-index 00000000..4887ebf3
+index 00000000..334362b3
 --- /dev/null
 +++ b/README-PCRE
-@@ -0,0 +1,1002 @@
+@@ -0,0 +1,1003 @@
 +README file for PCRE (Perl-compatible regular expression library)
 +-----------------------------------------------------------------
 +
@@ -1222,9 +1224,10 @@ index 00000000..4887ebf3
 +The latest release of PCRE1 is always available in three alternative formats
 +from:
 +
-+  ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-xxx.tar.gz
-+  ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-xxx.tar.bz2
-+  ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-xxx.zip
++  https://ftp.pcre.org/pub/pcre/pcre-x.xx.tar.gz
++  https://ftp.pcre.org/pub/pcre/pcre-x.xx.tar.bz2
++  https://ftp.pcre.org/pub/pcre/pcre-x.xx.tar.zip
++
 +
 +There is a mailing list for discussion about the development of PCRE at
 +pcre-dev@exim.org. You can access the archives and subscribe or manage your
@@ -2208,7 +2211,7 @@ index 00000000..4887ebf3
 +Philip Hazel
 +Email local part: ph10
 +Email domain: cam.ac.uk
-+Last updated: 10 February 2015
++Last updated: 12 February 2020
 diff --git a/README.md b/README.md
 new file mode 120000
 index 00000000..c3ca0746
@@ -2845,7 +2848,7 @@ index 00000000..8d69bc96
 +  PTHREAD_LIBS =
 +endif
 diff --git a/doc/html/pcreposix.html b/doc/html/pcreposix.html
-index 2cfce6d9..8fa415cd 100644
+index 2cfce6d9..7cd3ecc6 100644
 --- a/doc/html/pcreposix.html
 +++ b/doc/html/pcreposix.html
 @@ -42,6 +42,12 @@ man page, in case the conversion went wrong.
@@ -2861,8 +2864,74 @@ index 2cfce6d9..8fa415cd 100644
  This set of functions provides a POSIX-style API for the PCRE regular
  expression 8-bit library. See the
  <a href="pcreapi.html"><b>pcreapi</b></a>
+@@ -51,7 +57,7 @@ and 32-bit library.
+ </P>
+ <P>
+ The functions described here are just wrapper functions that ultimately call
+-the PCRE native API. Their prototypes are defined in the <b>pcreposix.h</b>
++the PCRE native API. Their prototypes are defined in the <b>pcreposix/pcreposix.h</b>
+ header file, and on Unix systems the library itself is called
+ <b>pcreposix.a</b>, so can be accessed by adding <b>-lpcreposix</b> to the
+ command for linking an application that uses them. Because the POSIX functions
+@@ -78,7 +84,7 @@ POSIX definition; it is not fully POSIX-compatible, and in multi-byte encoding
+ domains it is probably even less compatible.
+ </P>
+ <P>
+-The header for these functions is supplied as <b>pcreposix.h</b> to avoid any
++The header for these functions is supplied as <b>pcreposix/pcreposix.h</b> to avoid any
+ potential clash with other POSIX libraries. It can, of course, be renamed or
+ aliased as <b>regex.h</b>, which is the "correct" name. It provides two
+ structure types, <i>regex_t</i> for compiled internal forms, and
+diff --git a/doc/pcre.txt b/doc/pcre.txt
+index 8ffc9023..dea22160 100644
+--- a/doc/pcre.txt
++++ b/doc/pcre.txt
+@@ -9555,7 +9555,7 @@ NAME
+ 
+ SYNOPSIS
+ 
+-       #include <pcreposix.h>
++       #include <pcreposix/pcreposix.h>
+ 
+        int regcomp(regex_t *preg, const char *pattern,
+             int cflags);
+@@ -9578,10 +9578,11 @@ DESCRIPTION
+ 
+        The functions described here are just wrapper functions that ultimately
+        call  the  PCRE  native  API.  Their  prototypes  are  defined  in  the
+-       pcreposix.h  header  file,  and  on  Unix systems the library itself is
+-       called pcreposix.a, so can be accessed by  adding  -lpcreposix  to  the
+-       command  for  linking  an application that uses them. Because the POSIX
+-       functions call the native ones, it is also necessary to add -lpcre.
++       pcreposix/pcreposix.h header file, and  on  Unix  systems  the  library
++       itself is called pcreposix.a, so can be accessed by adding  -lpcreposix
++       to the command for linking  an application that uses them.  Because the
++       POSIX functions  call the  native ones,  it is  also  necessary to  add
++       -lpcre.
+ 
+        I have implemented only those POSIX option bits that can be  reasonably
+        mapped  to PCRE native options. In addition, the option REG_EXTENDED is
+@@ -9602,12 +9603,12 @@ DESCRIPTION
+        POSIX-compatible, and in multi-byte encoding  domains  it  is  probably
+        even less compatible.
+ 
+-       The  header for these functions is supplied as pcreposix.h to avoid any
+-       potential clash with other POSIX libraries. It can, of course,  be  re-
+-       named  or  aliased as regex.h, which is the "correct" name. It provides
+-       two structure types, regex_t for  compiled  internal  forms,  and  reg-
+-       match_t  for  returning  captured substrings. It also defines some con-
+-       stants whose names start with "REG_"; these are used  for  setting  op-
++       The  header for these functions is supplied as pcreposix/pcreposix.h to
++       avoid  any potential  clash  with  other POSIX libraries.  It  can,  of
++       course, be renamed or aliased as regex.h, which is the  "correct" name.
++       It provides two structure types, regex_t for compiled  internal  forms,
++       and regmatch_t for returning  captured substrings. It also defines some
++       constants whose names start with "REG_"; these are used for setting op-
+        tions and identifying error codes.
+ 
+ 
 diff --git a/doc/pcreposix.3 b/doc/pcreposix.3
-index a19235e9..1e8fc4bf 100644
+index a19235e9..84e8067e 100644
 --- a/doc/pcreposix.3
 +++ b/doc/pcreposix.3
 @@ -21,6 +21,11 @@ PCRE - Perl-compatible regular expressions.
@@ -2877,6 +2946,24 @@ index a19235e9..1e8fc4bf 100644
  This set of functions provides a POSIX-style API for the PCRE regular
  expression 8-bit library. See the
  .\" HREF
+@@ -31,7 +36,7 @@ additional functionality. There is no POSIX-style wrapper for PCRE's 16-bit
+ and 32-bit library.
+ .P
+ The functions described here are just wrapper functions that ultimately call
+-the PCRE native API. Their prototypes are defined in the \fBpcreposix.h\fP
++the PCRE native API. Their prototypes are defined in the \fBpcreposix/pcreposix.h\fP
+ header file, and on Unix systems the library itself is called
+ \fBpcreposix.a\fP, so can be accessed by adding \fB-lpcreposix\fP to the
+ command for linking an application that uses them. Because the POSIX functions
+@@ -54,7 +59,7 @@ described below. "POSIX-like in style" means that the API approximates to the
+ POSIX definition; it is not fully POSIX-compatible, and in multi-byte encoding
+ domains it is probably even less compatible.
+ .P
+-The header for these functions is supplied as \fBpcreposix.h\fP to avoid any
++The header for these functions is supplied as \fBpcreposix/pcreposix.h\fP to avoid any
+ potential clash with other POSIX libraries. It can, of course, be renamed or
+ aliased as \fBregex.h\fP, which is the "correct" name. It provides two
+ structure types, \fIregex_t\fP for compiled internal forms, and
 diff --git a/gitpatches/7810-spurious-undefined-behavior-fail-fix.txt b/gitpatches/7810-spurious-undefined-behavior-fail-fix.txt
 new file mode 100644
 index 00000000..bdb9297f
@@ -2921,4 +3008,4 @@ index 00000000..bdb9297f
 +---
 
 -- 
-tg: (2915f80d..) t/compat-readme (depends on: t/compat-version)
+tg: (1093d67f..) t/compat-readme (depends on: t/compat-version)

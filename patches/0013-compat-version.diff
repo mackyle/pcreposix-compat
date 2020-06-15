@@ -332,29 +332,29 @@ index dd9df7f6..d4b003e5 100644
  @WITH_REBUILD_CHARTABLES_TRUE@	./dftables$(EXEEXT) $@
  
 diff --git a/configure b/configure
-index 2db0796f..a59d4504 100755
+index 6d2a48e2..771650d5 100755
 --- a/configure
 +++ b/configure
-@@ -19723,7 +19723,7 @@ EXTRA_LIBPCRE32_LDFLAGS="$EXTRA_LIBPCRE32_LDFLAGS \
-                        $NO_UNDEFINED -version-info 0:11:0"
+@@ -19726,7 +19726,7 @@ EXTRA_LIBPCRE32_LDFLAGS="$EXTRA_LIBPCRE32_LDFLAGS \
+                        $NO_UNDEFINED -version-info 0:12:0"
  
  EXTRA_LIBPCREPOSIX_LDFLAGS="$EXTRA_LIBPCREPOSIX_LDFLAGS \
--                            $NO_UNDEFINED -version-info 0:6:0"
+-                            $NO_UNDEFINED -version-info 0:7:0"
 +                            $NO_UNDEFINED -version-info 1:0:0"
  
  EXTRA_LIBPCRECPP_LDFLAGS="$EXTRA_LIBPCRECPP_LDFLAGS \
-                           $NO_UNDEFINED -version-info 0:1:0 \
+                           $NO_UNDEFINED -version-info 0:2:0 \
 diff --git a/configure.ac b/configure.ac
-index d2e5236c..d75571a5 100644
+index 6a3e5f35..c56d7de0 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -20,7 +20,7 @@ m4_define(pcre_date, [2019-02-23])
- m4_define(libpcre_version, [3:11:2])
- m4_define(libpcre16_version, [2:11:2])
- m4_define(libpcre32_version, [0:11:0])
--m4_define(libpcreposix_version, [0:6:0])
+@@ -20,7 +20,7 @@ m4_define(pcre_date, [2020-02-12])
+ m4_define(libpcre_version, [3:12:2])
+ m4_define(libpcre16_version, [2:12:2])
+ m4_define(libpcre32_version, [0:12:0])
+-m4_define(libpcreposix_version, [0:7:0])
 +m4_define(libpcreposix_version, [1:0:0])
- m4_define(libpcrecpp_version, [0:1:0])
+ m4_define(libpcrecpp_version, [0:2:0])
  
  AC_PREREQ(2.57)
 diff --git a/doc/html/pcreposix.html b/doc/html/pcreposix.html
@@ -385,4 +385,4 @@ index 78ed0729..a19235e9 100644
  .B int regcomp(regex_t *\fIpreg\fP, const char *\fIpattern\fP,
 
 -- 
-tg: (6f02bedf..) t/compat-version (depends on: t/auto-jit)
+tg: (67a61d49..) t/compat-version (depends on: t/auto-jit)

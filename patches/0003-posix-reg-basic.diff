@@ -66,7 +66,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  9 files changed, 110 insertions(+), 28 deletions(-)
 
 diff --git a/pcre.h.generic b/pcre.h.generic
-index e9023046..77dd1725 100644
+index a936097f..fce572f5 100644
 --- a/pcre.h.generic
 +++ b/pcre.h.generic
 @@ -170,6 +170,7 @@ with J. */
@@ -90,7 +90,7 @@ index fdd9ac89..3559f436 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre_compile.c b/pcre_compile.c
-index f5f12cb3..e90f6ba7 100644
+index e5ba7638..293faa6c 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -964,21 +964,26 @@ Returns:    TRUE or FALSE
@@ -319,7 +319,7 @@ index f5f12cb3..e90f6ba7 100644
            {
            *code++ = OP_FAIL;
            previous = NULL;
-@@ -9188,7 +9219,8 @@ the offset for later. */
+@@ -9190,7 +9221,8 @@ the offset for later. */
  cd->external_flags = 0;   /* Initialize here for LIMIT_MATCH/RECURSION */
  
  while (ptr[skipatstart] == CHAR_LEFT_PARENTHESIS &&
@@ -346,7 +346,7 @@ index a6c8bc04..fc4b1b9a 100644
  #if (PUBLIC_COMPILE_OPTIONS & PUBLIC_EXTENDED_COMPILE_OPTIONS) != 0
  #error PUBLIC_EXTENDED_COMPILE_OPTIONS conflicts with PUBLIC_COMPILE_OPTIONS
 diff --git a/pcreposix.c b/pcreposix.c
-index aa28de12..ef8cf6b9 100644
+index f6896d48..56588ca4 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -274,6 +274,8 @@ int errorcode;
@@ -376,7 +376,7 @@ index e2cc94b8..44911231 100644
  /* Error values. Not all these are relevant or used by the wrapper. */
  
 diff --git a/pcretest.c b/pcretest.c
-index f1303037..b2d5af4b 100644
+index c1ee128b..7428bf26 100644
 --- a/pcretest.c
 +++ b/pcretest.c
 @@ -3793,7 +3793,7 @@ while (!done)
@@ -468,4 +468,4 @@ index b9a8fde6..85a538ad 100644
  /a\Cb/
 
 -- 
-tg: (bc34b222..) t/posix-reg-basic (depends on: t/posix-reg-newline)
+tg: (93626726..) t/posix-reg-basic (depends on: t/posix-reg-newline)

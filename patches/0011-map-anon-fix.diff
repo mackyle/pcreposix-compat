@@ -1,0 +1,43 @@
+From: Kyle J. McKay <mackyle@gmail.com>
+Subject: [PATCH] sljit/sljitExecAllocator.c: use MAP_ANON
+
+With the PCRE-8.44 release, sljitExecAllocator.c started testing
+to see if it can successfully mmap a PROT_WRITE + PROT_EXEC block
+of memory before adding the MAP_JIT flag.
+
+Unfortunately, unlike the rest of the code, the addition uses
+MAP_ANONYMOUS for that mapping rather than MAP_ANON.
+
+The file sljitUtils.c is included before sljitExecAllocator.c and
+is very careful to make sure that if MAP_ANON is NOT defined, but
+MAP_ANONYMOUS is, then it defines MAP_ANON to be MAP_ANONYMOUS.
+
+However, it *does not* do the reverse and on MacOSX systems that
+have a MAP_ANON definition, but *not* a MAP_ANONYMOUS definition,
+that new sljitExecAllocator.c code fails to compile.
+
+Change sljitExecAllocator.c to use MAP_ANON instead of MAP_ANONYMOUS
+to correct the problem.
+
+Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
+
+---
+ sljit/sljitExecAllocator.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sljit/sljitExecAllocator.c b/sljit/sljitExecAllocator.c
+index 92ddb949..f04613dd 100644
+--- a/sljit/sljitExecAllocator.c
++++ b/sljit/sljitExecAllocator.c
+@@ -124,7 +124,7 @@ static SLJIT_INLINE int get_map_jit_flag()
+ 		/* Kernel version for 10.14.0 (Mojave) */
+ 		if (atoi(name.release) >= 18) {
+ 			/* Only use MAP_JIT if a hardened runtime is used, because MAP_JIT is incompatible with fork(). */
+-			void *ptr = mmap(NULL, getpagesize(), PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
++			void *ptr = mmap(NULL, getpagesize(), PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANON, -1, 0);
+ 
+ 			if (ptr == MAP_FAILED) {
+ 				map_jit_flag = MAP_JIT;
+
+-- 
+tg: (970a2e51..) t/map-anon-fix (depends on: t/vendor)

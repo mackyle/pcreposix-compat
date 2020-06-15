@@ -37,7 +37,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  9 files changed, 38 insertions(+), 6 deletions(-)
 
 diff --git a/pcre.h.generic b/pcre.h.generic
-index 77dd1725..c9d7f452 100644
+index fce572f5..398bf83e 100644
 --- a/pcre.h.generic
 +++ b/pcre.h.generic
 @@ -171,6 +171,7 @@ with J. */
@@ -61,7 +61,7 @@ index 3559f436..c7b10a75 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre_compile.c b/pcre_compile.c
-index e90f6ba7..07c42499 100644
+index 293faa6c..a7892c12 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -4488,7 +4488,7 @@ register pcre_uchar *code = *codeptr;
@@ -83,7 +83,7 @@ index e90f6ba7..07c42499 100644
        {
        inescq = FALSE;
        ptr++;
-@@ -9220,7 +9221,7 @@ cd->external_flags = 0;   /* Initialize here for LIMIT_MATCH/RECURSION */
+@@ -9222,7 +9223,7 @@ cd->external_flags = 0;   /* Initialize here for LIMIT_MATCH/RECURSION */
  
  while (ptr[skipatstart] == CHAR_LEFT_PARENTHESIS &&
         ptr[skipatstart+1] == CHAR_ASTERISK &&
@@ -109,7 +109,7 @@ index fc4b1b9a..cc3ab4e1 100644
  #if (PUBLIC_COMPILE_OPTIONS & PUBLIC_EXTENDED_COMPILE_OPTIONS) != 0
  #error PUBLIC_EXTENDED_COMPILE_OPTIONS conflicts with PUBLIC_COMPILE_OPTIONS
 diff --git a/pcreposix.c b/pcreposix.c
-index ef8cf6b9..82d40c1d 100644
+index 56588ca4..76c4f61a 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -284,6 +284,7 @@ if ((cflags & REG_NOSUB) != 0)    options |= PCRE_NO_AUTO_CAPTURE;
@@ -133,7 +133,7 @@ index 44911231..853d3326 100644
  #define REG_BASIC     0        /* BSD define */
  #define REG_EXTENDED  0x1000   /* Maps to !PCRE_POSIX_BASIC_ESC */
 diff --git a/pcretest.c b/pcretest.c
-index b2d5af4b..946c811e 100644
+index 7428bf26..68c26be8 100644
 --- a/pcretest.c
 +++ b/pcretest.c
 @@ -3788,6 +3788,7 @@ while (!done)
@@ -197,4 +197,4 @@ index 85a538ad..f57de3c1 100644
      aXb
 
 -- 
-tg: (be1d58bd..) t/compat-reg-nospec (depends on: t/posix-reg-basic)
+tg: (1beb35be..) t/compat-reg-nospec (depends on: t/posix-reg-basic)

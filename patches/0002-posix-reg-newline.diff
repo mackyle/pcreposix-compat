@@ -151,7 +151,7 @@ index 77890f36..78ed0729 100644
  .
  .SH "MATCHING A PATTERN"
 diff --git a/pcre.h.generic b/pcre.h.generic
-index b578eb11..e9023046 100644
+index 86e3956c..a936097f 100644
 --- a/pcre.h.generic
 +++ b/pcre.h.generic
 @@ -169,6 +169,7 @@ with J. */
@@ -175,7 +175,7 @@ index d4d78926..fdd9ac89 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre_compile.c b/pcre_compile.c
-index 83595d54..f5f12cb3 100644
+index 0e47337d..e5ba7638 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -279,6 +279,12 @@ static const pcre_uchar sub_end_of_word[] = {
@@ -236,7 +236,7 @@ index c04f2ff6..a6c8bc04 100644
  #if (PUBLIC_COMPILE_OPTIONS & PUBLIC_EXTENDED_COMPILE_OPTIONS) != 0
  #error PUBLIC_EXTENDED_COMPILE_OPTIONS conflicts with PUBLIC_COMPILE_OPTIONS
 diff --git a/pcreposix.c b/pcreposix.c
-index a76d6bfc..aa28de12 100644
+index 3042d763..f6896d48 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -275,13 +275,17 @@ int options = 0;
@@ -422,4 +422,4 @@ index 020f51e3..b9a8fde6 100644
  /a\Cb/
 
 -- 
-tg: (616b9d9b..) t/posix-reg-newline (depends on: t/pcre-extended-options)
+tg: (54b03d9a..) t/posix-reg-newline (depends on: t/pcre-extended-options)

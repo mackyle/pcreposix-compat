@@ -17,7 +17,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  2 files changed, 58 insertions(+), 6 deletions(-)
 
 diff --git a/pcre_jit_compile.c b/pcre_jit_compile.c
-index bc5f9c01..3134be53 100644
+index 4dcf8fc2..21408d57 100644
 --- a/pcre_jit_compile.c
 +++ b/pcre_jit_compile.c
 @@ -46,6 +46,42 @@ POSSIBILITY OF SUCH DAMAGE.
@@ -152,4 +152,4 @@ index 034cb526..faac5a2d 100644
  #endif
 
 -- 
-tg: (48640194..) t/pcre-jit-stubs (depends on: t/vendor)
+tg: (e89eec4a..) t/pcre-jit-stubs (depends on: t/vendor)

@@ -19,7 +19,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  5 files changed, 16 insertions(+), 7 deletions(-)
 
 diff --git a/pcre.h.generic b/pcre.h.generic
-index 81fd8c13..021314f2 100644
+index fb02ed4e..76e74150 100644
 --- a/pcre.h.generic
 +++ b/pcre.h.generic
 @@ -173,6 +173,7 @@ with J. */
@@ -43,7 +43,7 @@ index 37245f8b..bb895392 100644
  /* Exec-time and get/set-time error codes */
  
 diff --git a/pcre_compile.c b/pcre_compile.c
-index ed2aab3d..f9052649 100644
+index da823a56..dbbc4ebd 100644
 --- a/pcre_compile.c
 +++ b/pcre_compile.c
 @@ -4496,6 +4496,7 @@ pcre_uchar *orig_code = code;
@@ -127,7 +127,7 @@ index ce53995b..11b4aed2 100644
  #if (PUBLIC_COMPILE_OPTIONS & PUBLIC_EXTENDED_COMPILE_OPTIONS) != 0
  #error PUBLIC_EXTENDED_COMPILE_OPTIONS conflicts with PUBLIC_COMPILE_OPTIONS
 diff --git a/pcreposix.c b/pcreposix.c
-index 1f1a4b2c..71f791e2 100644
+index 3c825c74..396afc0d 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -331,6 +331,7 @@ else if (pattern == NULL) return REG_INVARG;
@@ -140,4 +140,4 @@ index 1f1a4b2c..71f791e2 100644
  
 
 -- 
-tg: (6dab83fa..) t/posix-reg-extended (depends on: t/compat-reg-pend)
+tg: (a8c16885..) t/posix-reg-extended (depends on: t/compat-reg-pend)

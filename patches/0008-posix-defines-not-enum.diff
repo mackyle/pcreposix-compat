@@ -18,7 +18,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  1 file changed, 17 insertions(+), 20 deletions(-)
 
 diff --git a/pcreposix.h b/pcreposix.h
-index 413fc566..e1c0a044 100644
+index 7fc6fbd4..4d5dddd5 100644
 --- a/pcreposix.h
 +++ b/pcreposix.h
 @@ -135,26 +135,23 @@ also apply to REG_JAVASCPT but REG_JAVASCPT also sets PCRE_JAVASCRIPT_COMPAT. */
@@ -67,4 +67,4 @@ index 413fc566..e1c0a044 100644
  
 
 -- 
-tg: (b02f9e75..) t/posix-defines-not-enum (depends on: t/extras-reg-pcre)
+tg: (64571e95..) t/posix-defines-not-enum (depends on: t/extras-reg-pcre)

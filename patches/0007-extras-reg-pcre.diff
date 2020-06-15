@@ -123,14 +123,14 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  2 files changed, 119 insertions(+), 30 deletions(-)
 
 diff --git a/pcreposix.c b/pcreposix.c
-index 71f791e2..6ec4a288 100644
+index 396afc0d..749e5d2a 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -7,6 +7,8 @@ and semantics are as close as possible to those of the Perl 5 language.
  
                         Written by Philip Hazel
-            Copyright (c) 1997-2018 University of Cambridge
-+           Copyright (C) 2017-2018 Kyle J. McKay <mackyle@gmail.com>
+            Copyright (c) 1997-2020 University of Cambridge
++           Copyright (C) 2017-2020 Kyle J. McKay <mackyle@gmail.com>
 +           All Rights Reserved
  
  -----------------------------------------------------------------------------
@@ -192,7 +192,7 @@ index 71f791e2..6ec4a288 100644
  
  preg->re_pcre = pcre_compile2(pattern, options, &errorcode, &errorptr,
    &erroffset, NULL);
-@@ -395,7 +417,12 @@ int options = 0;
+@@ -396,7 +418,12 @@ int options = 0;
  int *ovector = NULL;
  int small_ovector[POSIX_MALLOC_THRESHOLD * 3];
  BOOL allocated_ovector = FALSE;
@@ -207,7 +207,7 @@ index 71f791e2..6ec4a288 100644
  
  if ((eflags & REG_NOTBOL) != 0) options |= PCRE_NOTBOL;
 diff --git a/pcreposix.h b/pcreposix.h
-index 248f7977..413fc566 100644
+index 248f7977..7fc6fbd4 100644
 --- a/pcreposix.h
 +++ b/pcreposix.h
 @@ -1,6 +1,6 @@
@@ -226,7 +226,7 @@ index 248f7977..413fc566 100644
  
 -            Copyright (c) 1997-2012 University of Cambridge
 +            Copyright (C) 1997-2012 University of Cambridge
-+            Copyright (C) 2017 Kyle J. McKay <mackyle@gmail.com>
++            Copyright (C) 2017-2020 Kyle J. McKay <mackyle@gmail.com>
 +            All Rights Reserved
  
  -----------------------------------------------------------------------------
@@ -349,4 +349,4 @@ index 248f7977..413fc566 100644
  
 
 -- 
-tg: (52136918..) t/extras-reg-pcre (depends on: t/posix-reg-extended)
+tg: (0ab43431..) t/extras-reg-pcre (depends on: t/posix-reg-extended)

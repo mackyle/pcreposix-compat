@@ -6,7 +6,7 @@ branch of this repository.  If this file has been detached from its home
 repository see the project link at the end of this file.
 
 The patches in the `patches` subdirectory can be applied to the official
-PCRE 8.43 release tarball to provide the "pcreposix-compat" version that
+PCRE 8.44 release tarball to provide the "pcreposix-compat" version that
 can build the "pcreposix" headers and libraries that provide full POSIX
 BRE and ERE support as well as PCRE and JRE support.
 
@@ -22,13 +22,14 @@ PCRE Source Tarball
 
 These patches are intended to be applied to the following tarball:
 
-https://ftp.pcre.org/pub/pcre/pcre-8.43.tar.gz
+https://ftp.pcre.org/pub/pcre/pcre-8.44.tar.gz
 
-      size:  2085854 byte(s)
-       md5:  e775489c9f024a92ca0f431301ef4c5c
-      sha1:  8f36ed69d3e938972fc511c19bfaa0ff27ff1d71
-      blob:  73389614439b81cc42e42382d492c74795b00f66
-    sha256:  0b8e7465dc5e98c757cc3650a20a7843ee4c3edf50aaf60bb33fd879690d2c73
+      size:  2090750 byte(s)
+       md5:  3bcd2441024d00009a5fee43f058987c
+      sha1:  934324e2d0e7c16d144c52817ab88f6f70c24692
+      blob:  a8529764ef8062d6fed11ec589cafc2185cf8986
+    sha256:  aecafd4af3bd0f3935721af77b889d9024b2e01d96b58471bd91a3063fb47728
+
 
 
 

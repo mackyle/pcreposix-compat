@@ -8,6 +8,7 @@
 0008-posix-defines-not-enum.diff -p1
 0009-posix-regoff-type.diff -p1
 0010-pcre-jit-stubs.diff -p1
-0011-auto-jit.diff -p1
-0012-compat-version.diff -p1
-0013-compat-readme.diff -p1
+0011-map-anon-fix.diff -p1
+0012-auto-jit.diff -p1
+0013-compat-version.diff -p1
+0014-compat-readme.diff -p1

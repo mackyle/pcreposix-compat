@@ -19,7 +19,7 @@ Signed-off-by: Kyle J. McKay <mackyle@gmail.com>
  3 files changed, 97 insertions(+), 12 deletions(-)
 
 diff --git a/pcreposix.c b/pcreposix.c
-index 2d99715c..ce6877f1 100644
+index 653f983e..9060f2ea 100644
 --- a/pcreposix.c
 +++ b/pcreposix.c
 @@ -212,6 +212,17 @@ static const char *const pstring[] = {
@@ -127,7 +127,7 @@ index 2d99715c..ce6877f1 100644
    &erroffset, NULL);
  preg->re_erroffset = erroffset;
  if (dupez) free(dupez);
-@@ -378,15 +449,16 @@ if (dupez) free(dupez);
+@@ -378,16 +449,17 @@ if (dupez) free(dupez);
  /* Safety: if the error code is too big for the translation vector (which
  should not happen, but we all make mistakes), return REG_BADPAT. */
  
@@ -142,11 +142,12 @@ index 2d99715c..ce6877f1 100644
 +(void)pcre_fullinfo((const pcre *)preg->re_impl, NULL, PCRE_INFO_CAPTURECOUNT,
    &re_nsub);
  preg->re_nsub = (size_t)re_nsub;
+ preg->re_erroffset = (size_t)(-1);  /* No meaning after successful compile */
 +regcomp_jit(preg);
  return 0;
  }
  
-@@ -419,12 +491,24 @@ int *ovector = NULL;
+@@ -420,12 +492,24 @@ int *ovector = NULL;
  int small_ovector[POSIX_MALLOC_THRESHOLD * 3];
  BOOL allocated_ovector = FALSE;
  BOOL nosub;
@@ -173,7 +174,7 @@ index 2d99715c..ce6877f1 100644
  
  if ((eflags & REG_NOTBOL) != 0) options |= PCRE_NOTBOL;
  if ((eflags & REG_NOTEOL) != 0) options |= PCRE_NOTEOL;
-@@ -475,7 +559,7 @@ else
+@@ -474,7 +558,7 @@ else
  
  len = (int)(eo - so);
  if ((size_t)len != (eo - so)) return REG_INVARG;
@@ -183,7 +184,7 @@ index 2d99715c..ce6877f1 100644
  
  if (rc == 0) rc = (int)nmatch;    /* All captured slots were filled in */
 diff --git a/pcreposix.h b/pcreposix.h
-index 11a5c9f6..27b89653 100644
+index 7de0904e..ef2d0f2b 100644
 --- a/pcreposix.h
 +++ b/pcreposix.h
 @@ -156,7 +156,7 @@ also apply to REG_JAVASCPT but REG_JAVASCPT also sets PCRE_JAVASCRIPT_COMPAT. */
@@ -196,7 +197,7 @@ index 11a5c9f6..27b89653 100644
    size_t re_erroffset;
    const char *re_endp; /* REG_PEND only */
 diff --git a/pcretest.c b/pcretest.c
-index 946c811e..f037e810 100644
+index 68c26be8..f3e2867b 100644
 --- a/pcretest.c
 +++ b/pcretest.c
 @@ -3018,6 +3018,7 @@ clock_t total_match_time = 0;
@@ -236,4 +237,4 @@ index 946c811e..f037e810 100644
    if (re != NULL) new_free(re);
 
 -- 
-tg: (342c5054..) t/auto-jit (depends on: t/posix-regoff-type t/pcre-jit-stubs)
+tg: (9c9dbf4c..) t/auto-jit (depends on: t/posix-regoff-type t/pcre-jit-stubs t/map-anon-fix)
